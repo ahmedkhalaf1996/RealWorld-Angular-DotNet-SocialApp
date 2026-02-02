@@ -11,3 +11,5 @@ public class MongoDBSettings {
     public string NotificationCollection {get; set;} = null!;
 
 }
+
+// up

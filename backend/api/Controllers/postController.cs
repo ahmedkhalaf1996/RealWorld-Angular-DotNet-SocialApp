@@ -219,7 +219,7 @@ public class PostController: Controller {
             }
         }
 
-        // upate post
+        // upate post up
         var upPost = await _postService.UpdatePost(id, post);
         if (upPost is null){
             return BadRequest(new {message = "can not update the post."});

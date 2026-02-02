@@ -50,7 +50,7 @@ public class UserController: Controller {
 
         await _UserService.CreateAsync(user);
 
-        // create token
+        // create token up
         var claims = new List<Claim> 
         {
             new Claim(JwtRegisteredClaimNames.Sub, user._id ?? throw new InvalidOperationException()),
