@@ -1,2 +1,1 @@
 # RealWorld-Angular-DotNet-SocialApp
-#
