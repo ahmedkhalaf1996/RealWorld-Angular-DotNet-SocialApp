@@ -165,7 +165,7 @@ public class PostController: Controller {
 
         }
 
-        // add the new data
+        // add the new data up 
         post.title = body.title;
         post.message = body.message;
         post.selectedFile = body.selectedFile;
