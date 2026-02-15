@@ -10,6 +10,7 @@ public class MongoDBSettings {
 
     public string NotificationCollection {get; set;} = null!;
 
+    public string CommentCollection {get; set;} = null!;
 }
 
 // up 

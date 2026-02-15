@@ -9,9 +9,9 @@ namespace backend.Conrollers;
 [Route("/notification")]
 
 public class NotificationController: Controller {
-    private readonly NotificationService _notificationService;
+    private readonly INotificationService _notificationService;
 
-    public NotificationController(NotificationService notificationService){
+    public NotificationController(INotificationService notificationService){
         _notificationService = notificationService;
     }
 

@@ -9,10 +9,10 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDB"));
-builder.Services.AddSingleton<UserService>();
+builder.Services.AddSingleton<IUserService, UserService>();
 builder.Services.AddSingleton<ChatService>();
-builder.Services.AddSingleton<PostService>();
-builder.Services.AddSingleton<NotificationService>();
+builder.Services.AddSingleton<IPostService,PostService>();
+builder.Services.AddSingleton<INotificationService, NotificationService>();
 builder.Services.AddCors();
 
 var jwtsecret = builder.Configuration.GetSection("JwtSecret")["Secret"] ?? 
@@ -39,15 +39,17 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
-
-builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
+
 builder.Services.AddSwaggerGen(option =>
 {
-    option.SwaggerDoc("v1", new OpenApiInfo {Title = "Socail Rest Api", Version = "v1"});
+    option.SwaggerDoc("v1", new OpenApiInfo {
+        Title = "Socail Rest Api",
+         Version = "v1"
+    });
+
     option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -57,6 +59,7 @@ builder.Services.AddSwaggerGen(option =>
         BearerFormat = "JWT",
         Scheme = "Bearer"
     });
+
     option.AddSecurityRequirement(new OpenApiSecurityRequirement{
         {
             new OpenApiSecurityScheme
@@ -67,7 +70,7 @@ builder.Services.AddSwaggerGen(option =>
                     Id="Bearer"
                 }
             },
-            new string[]{}
+            Array.Empty<string>()
         }
     });
 });
@@ -77,9 +80,14 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Socail Api V1");
+    });
 }
 
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.UseHttpsRedirection();
 
@@ -87,4 +95,3 @@ app.UseHttpsRedirection();
 
 app.Run();
 
-// up

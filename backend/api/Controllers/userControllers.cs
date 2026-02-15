@@ -19,13 +19,16 @@ namespace backend.Conrollers;
 
 public class UserController: Controller {
     private readonly IConfiguration _configuration;
-    private readonly UserService _UserService;
-    private readonly NotificationService _notificationService;
+    private readonly IUserService _UserService;
+    private readonly IPostService _postService;
+    private readonly INotificationService _notificationService;
     
-    public UserController(UserService userService, 
-                        NotificationService notificationService,
+    public UserController(IUserService userService, 
+                        IPostService postService,
+                        INotificationService notificationService,
                         IConfiguration configuration){
         _UserService = userService;
+        _postService = postService;
         _notificationService = notificationService;
         _configuration = configuration;
     }
@@ -125,7 +128,7 @@ public class UserController: Controller {
 
     [HttpGet]
     [Route("getUser/{id}")]
-    public async Task<IActionResult> GetUserById([FromRoute] string id){
+    public async Task<IActionResult> GetUserById([FromRoute] string id, [FromQuery] int page){
         try {
             var user = new  User{};
 
@@ -135,8 +138,9 @@ public class UserController: Controller {
                 return NotFound(new {message= "User with gien id is not found!."});
             }
 
-            // TODO return also the user posts
-            return Ok( new { user = user, posts = Array.Empty<object>()});
+            // 
+            var postsData = await _postService.Query(new List<string>{id}, page);
+            return Ok( new { user = user, posts = postsData});
         } 
         catch 
         {
@@ -225,11 +229,12 @@ public class UserController: Controller {
                 user2.followers = fo2;
                 // Call notification Start 
                 var deat = user1.name + " Start Following You";
-                var us = new UserIn{name = user1.name, avatar = user1.imageUrl};
+                var us = new UserIn{name = user1.name, imageUrl = user1.imageUrl};
                 var nofification = new Notification {
                     mainuid = user2._id,
                     targetid = user1._id,
                     deatils = deat,
+                    senderid = user1._id,
                     user = us
                 };
 

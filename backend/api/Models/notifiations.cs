@@ -12,6 +12,8 @@ namespace backend.Models
         public string mainuid {get;set;} = null!;
         public string targetid {get;set;} = null!;
 
+        public string senderid {get;set;} = null!;
+
         public bool isreded {get; set;} = false;
         public DateTime? createdAt {get; set;} = DateTime.Now;
 
@@ -20,7 +22,7 @@ namespace backend.Models
 
     public class UserIn {
         public string name {get;set;} = null!;
-        public string avatar {get;set;} = null!;
+        public string imageUrl {get;set;} = null!;
 
     }
 }
