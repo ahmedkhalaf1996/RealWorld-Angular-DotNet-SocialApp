@@ -13,10 +13,10 @@ namespace backend.Conrollers;
 
 public class PostController: Controller {
     private readonly IConfiguration _configuration;
-    private readonly PostService _postService;
-        private readonly NotificationService _notificationService;
+    private readonly IPostService _postService;
+        private readonly INotificationService _notificationService;
 
-    public PostController(PostService postService,    NotificationService notificationService,IConfiguration configuration){
+    public PostController(IPostService postService,    INotificationService notificationService,IConfiguration configuration){
         _postService = postService;
         _notificationService = notificationService;
 
@@ -55,12 +55,12 @@ public class PostController: Controller {
         if(id is null){
             return BadRequest(new {message = "proplem with provided id"});
         }
-        var post = new Post{};
-        post = await _postService.GetPostByID(id);
+        // var post = new PostResponse{};
+        var post = await _postService.GetPostByID(id);
 
         if(post is null) return NotFound(new {message = "post not found", Success = false});
 
-        return Ok(new {post = post});
+        return Ok(new { post });
     }
 
     [HttpPost]
@@ -73,25 +73,25 @@ public class PostController: Controller {
         var post = await _postService.GetPostByID(id);
         if(post is null) return NotFound(new {message = "post not found", Success = false});
 
-        post.comments.Add(body.value);
-
-        var npost = await _postService.UpdatePost(id, post);
-
-        if(npost is null) return NotFound(new {message = "proplem with prodived value", Success = false});
-
         var userIDToken = User.FindFirstValue(ClaimTypes.NameIdentifier)?.ToString();
+        if(userIDToken is null) return Unauthorized();
+
+        // craeting a comment
+        await _postService.CreateComment(id, userIDToken, body.value);
+
+
         if(post.creator != null && userIDToken != null ){
         // Call notification Start 
-            var user = new User{};
-            user = await _postService.GetUsByid(userIDToken);
+           var user = await _postService.GetUsByid(userIDToken);
             if (user is not null){
                         
             var deat = user.name + " Comment On Your Post";
-            var us = new UserIn{name = user.name, avatar = user.imageUrl};
+            var us = new UserIn{name = user.name, imageUrl = user.imageUrl};
             var nofification = new Notification {
                 mainuid = post.creator,
                 targetid =id,
                 deatils = deat,
+                senderid = userIDToken,
                 user = us
             };
             
@@ -127,8 +127,7 @@ public class PostController: Controller {
     public async Task<IActionResult> GetPostsPagenationAsync([FromQuery] int Page, [FromQuery] string id){
         if(id == "undefind") return BadRequest(new {message = "proplem with provided id"});
 
-        var user = new User{};
-        user = await _postService.GetUsByid(id);
+        var user = await _postService.GetUsByid(id);
 
         if(user is null || user._id is null){
             return NotFound(new {message = "user with given id is not found."});
@@ -137,7 +136,7 @@ public class PostController: Controller {
         var ides = user.following;
         ides.Add(user._id.ToString());
 
-        return Ok(_postService.Query(ides, Page));
+        return Ok(await _postService.Query(ides, Page));
     }
 
     [HttpPatch]
@@ -153,30 +152,42 @@ public class PostController: Controller {
         }
 
 
-        var post = new Post{};
-        post = await _postService.GetPostByID(id);
+        var postResponse = await _postService.GetPostByID(id);
 
-        if (post is null){
+        if (postResponse is null){
             return NotFound(new {message = "post with given id is not found.."});
         }
 
-        if (userIDToken != post.creator){
+        if (userIDToken != postResponse.creator){
             return Unauthorized(new {message = "Not Authorized. you are not the creator of post"});
 
         }
 
-        // add the new data up 
-        post.title = body.title;
-        post.message = body.message;
-        post.selectedFile = body.selectedFile;
+        if (body.title is null && body.message is null && body.selectedFile is null)
+        {
+            return BadRequest(new {message = "proplem with profived body data."});
+        }
+
+        // create new post obj
+        var postUpdate = new Post
+        {
+            _id = id,
+            creator = postResponse.creator ,
+            title = body.title ?? postResponse.title,
+            message = body.message ?? postResponse.message,
+            selectedFile = body.selectedFile ?? postResponse.selectedFile,
+            likes = postResponse.likes,
+            createdAt = postResponse.createdAt ?? DateTime.Now,
+        };
+   
 
         // upate post
-        var upPost = await _postService.UpdatePost(id, post);
+        var upPost = await _postService.UpdatePost(id, postUpdate);
         if (upPost is null){
             return BadRequest(new {message = "can not update the post."});
         }    
 
-        return Ok(new {post = post});    
+        return Ok(new {post = upPost});    
     }
 
     [HttpPatch]
@@ -187,29 +198,32 @@ public class PostController: Controller {
              return NotFound(new {message = "Not Authorized."});
         }
         
-        var post = new Post{};
-        post = await _postService.GetPostByID(id);
+        var postResponse = await _postService.GetPostByID(id);
         
-        if (post is null){
+        if (postResponse is null){
             return NotFound(new {message = "post with given id is not found.."});
         }
 
-        if(post.likes.Contains(userIDToken)){
-            post.likes.Remove(userIDToken);
+        var likes = postResponse.likes ?? new List<string>();
+
+
+        if(likes.Contains(userIDToken)){
+            likes.Remove(userIDToken);
         } else {
-            post.likes.Add(userIDToken);
+           likes.Add(userIDToken);
             // TODO Call Notification .. notofy the user about the new user like about the post
-            if (post.creator != null){
+            if (postResponse.creator != null){
                     var user = new User{};
                 user = await _postService.GetUsByid(userIDToken);
                 if (user is not null){
                             
                 var deat = user.name + " Like Your Post";
-                var us = new UserIn{name = user.name, avatar = user.imageUrl};
+                var us = new UserIn{name = user.name, imageUrl = user.imageUrl};
                 var nofification = new Notification {
-                    mainuid = post.creator,
+                    mainuid = postResponse.creator,
                     targetid =id,
                     deatils = deat,
+                    senderid = userIDToken,
                     user = us
                 };
                 
@@ -219,13 +233,28 @@ public class PostController: Controller {
             }
         }
 
+
+        // create new post obj
+        var postUpdate = new Post
+        {
+            _id = id,
+            creator = postResponse.creator ,
+            title =  postResponse.title,
+            message =  postResponse.message,
+            selectedFile =  postResponse.selectedFile,
+            likes = likes,
+            createdAt = postResponse.createdAt ?? DateTime.Now,
+        };
+   
+
         // upate post
-        var upPost = await _postService.UpdatePost(id, post);
+        var upPost = await _postService.UpdatePost(id, postUpdate);
         if (upPost is null){
             return BadRequest(new {message = "can not update the post."});
         }    
 
-        return Ok(new {post = post});  
+        var enrichedPost = await _postService.GetPostByID(id);
+        return Ok(new {post = enrichedPost});  
 
 
     }
@@ -238,8 +267,7 @@ public class PostController: Controller {
              return NotFound(new {message = "Not Authorized."});
         }
         
-        var post = new Post{};
-        post = await _postService.GetPostByID(id);
+        var post = await _postService.GetPostByID(id);
         
         if (post is null){
             return NotFound(new {message = "post with given id is not found.."});
@@ -254,7 +282,43 @@ public class PostController: Controller {
 
     }
 
+[HttpDelete]
+[Route("/comments/{postId}/comments/{commentId}"), Authorize] 
+public async Task<IActionResult> DeleteComment([FromRoute] string postId, [FromRoute] string commentId)
+ {
+    var userIDToken = User.FindFirstValue(ClaimTypes.NameIdentifier)?.ToString();
+    if (userIDToken is null){
+             return NotFound(new {message = "Not Authorized."});
+    }
+ 
+    var post = await _postService.GetPostByID(postId);
+    if (post is null) return NotFound(new {message = "post not found"});
+
+    var postCreatorId = post.creator ?? "unnown";
+
+    try
+    {
+      var deleted = await _postService.DeleteComment(commentId, userIDToken, postCreatorId);
+      if (!deleted) return NotFound(new {message = "comment not found"});
+
+      return Ok(
+        new
+        {
+            message = "Comment Deleted Successfully",
+            deletedCommentId = commentId
+        });
+
+    } catch (UnauthorizedAccessException)
+        {
+            return Unauthorized(new {message = "You are not authoreized to delete this comment"});
+        }
+ }
+ 
+
+
+
 }
 
 
- 
+
+
