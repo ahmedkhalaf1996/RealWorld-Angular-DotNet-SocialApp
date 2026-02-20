@@ -15,6 +15,11 @@ builder.Services.AddSingleton<IPostService,PostService>();
 builder.Services.AddSingleton<INotificationService, NotificationService>();
 builder.Services.AddCors();
 
+
+// gRPC Services 
+builder.Services.AddGrpc();
+builder.Services.AddSingleton<IRealtimeNotificationClient, RealtimeNotificationClient>();
+
 var jwtsecret = builder.Configuration.GetSection("JwtSecret")["Secret"] ?? 
         throw new InvalidOperationException();
 
@@ -91,7 +96,8 @@ app.UseAuthorization();
 app.MapControllers();
 app.UseHttpsRedirection();
 
-
+// Map Grpc Service 
+app.MapGrpcService<RealtimeChatGrpcService>();
 
 app.Run();
 

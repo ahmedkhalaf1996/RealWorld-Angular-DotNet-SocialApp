@@ -5,6 +5,8 @@ using System.Security.Claims;
 using backend.Services; 
 using backend.interfaces;
 using backend.Models;
+using backend.Protos;
+using Google.Protobuf.WellKnownTypes;
 
 namespace backend.Conrollers;
 
@@ -15,11 +17,15 @@ public class PostController: Controller {
     private readonly IConfiguration _configuration;
     private readonly IPostService _postService;
         private readonly INotificationService _notificationService;
+        private readonly IRealtimeNotificationClient _realtimeNotificationClient;
 
-    public PostController(IPostService postService,    INotificationService notificationService,IConfiguration configuration){
+    public PostController(IPostService postService,   
+     INotificationService notificationService,
+     IRealtimeNotificationClient realtimeNotificationClient, 
+     IConfiguration configuration){
         _postService = postService;
         _notificationService = notificationService;
-
+        _realtimeNotificationClient = realtimeNotificationClient;
         _configuration = configuration;
 
     }
@@ -97,14 +103,42 @@ public class PostController: Controller {
             
               await _notificationService.CreateNotification(nofification);
 
+              // gRPC Realtime notification
+              try
+              {
+                await _realtimeNotificationClient.SendGrpcNotificationAsync(new NotificationGrpcRequest
+                {
+                    Mainuid = post.creator ?? "",
+                    Targetid = id ?? "",
+                    Id = Guid.NewGuid().ToString(),
+                    Deatils = deat ?? "",
+                    Isreded = false,
+                    CreatedAt = Timestamp.FromDateTime(DateTime.UtcNow),
+                    User = new Usergrpc
+                    {
+                        Name = user.name ?? "",
+                        ImageUrl = user.imageUrl ?? ""
+                    }
+                    
+                });
+              }
+              catch (Exception ex)
+              {
+                
+               Console.WriteLine($"Error sending gRPC comment notification: {ex.Message}");
+              }
+
             }
 
             // call nofification end
         }
 
 
-        return Ok(new {data=post});
-
+        // return Ok(new {data=post});
+#pragma warning disable CS8604 // Possible null reference argument.
+        var updatedPost = await _postService.GetPostWithComments(id);
+#pragma warning restore CS8604 // Possible null reference argument.
+        return Ok(new {post = updatedPost});
     }
 
     [HttpGet]
@@ -229,6 +263,35 @@ public class PostController: Controller {
                 
                 await _notificationService.CreateNotification(nofification);
 
+
+             // gRPC Realtime notification
+              try
+              {
+                await _realtimeNotificationClient.SendGrpcNotificationAsync(new NotificationGrpcRequest
+                {
+                    Mainuid = postResponse.creator ?? "",
+                    Targetid = id ?? "",
+                    Id = Guid.NewGuid().ToString(),
+                    Deatils = deat ?? "",
+                    Isreded = false,
+                    CreatedAt = Timestamp.FromDateTime(DateTime.UtcNow),
+                    User = new Usergrpc
+                    {
+                        Name = user.name ?? "",
+                        ImageUrl = user.imageUrl ?? ""
+                    }
+                    
+                });
+              }
+              catch (Exception ex)
+              {
+                
+               Console.WriteLine($"Error sending gRPC comment notification: {ex.Message}");
+              }
+
+
+
+
             }
             }
         }
@@ -245,10 +308,12 @@ public class PostController: Controller {
             likes = likes,
             createdAt = postResponse.createdAt ?? DateTime.Now,
         };
-   
+
 
         // upate post
+#pragma warning disable CS8604 // Possible null reference argument.
         var upPost = await _postService.UpdatePost(id, postUpdate);
+#pragma warning restore CS8604 // Possible null reference argument.
         if (upPost is null){
             return BadRequest(new {message = "can not update the post."});
         }    
