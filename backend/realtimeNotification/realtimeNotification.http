@@ -1,0 +1,6 @@
+@realtimeNotification_HostAddress = http://localhost:5191
+
+GET {{realtimeNotification_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

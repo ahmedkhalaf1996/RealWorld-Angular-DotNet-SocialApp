@@ -9,6 +9,8 @@ using backend.Services;
 using backend.Models;
 using backend.interfaces;
 using Microsoft.AspNetCore.Authorization;
+using backend.Protos;
+using Google.Protobuf.WellKnownTypes;
 
 
 namespace backend.Conrollers;
@@ -22,14 +24,17 @@ public class UserController: Controller {
     private readonly IUserService _UserService;
     private readonly IPostService _postService;
     private readonly INotificationService _notificationService;
+    private readonly IRealtimeNotificationClient _realtimeNotificationClient;
     
     public UserController(IUserService userService, 
                         IPostService postService,
                         INotificationService notificationService,
+                        IRealtimeNotificationClient realtimeNotificationClient,
                         IConfiguration configuration){
         _UserService = userService;
         _postService = postService;
         _notificationService = notificationService;
+        _realtimeNotificationClient = realtimeNotificationClient;
         _configuration = configuration;
     }
 
@@ -240,10 +245,44 @@ public class UserController: Controller {
 
                 await _notificationService.CreateNotification(nofification);
                 // call nofification end
+
+
+             // gRPC Realtime notification
+              try
+              {
+                await _realtimeNotificationClient.SendGrpcNotificationAsync(new NotificationGrpcRequest
+                {
+                    Mainuid = user2._id ?? "",
+                    Targetid = user1._id ?? "",
+                    Id = Guid.NewGuid().ToString(),
+                    Deatils = deat ?? "",
+                    Isreded = false,
+                    CreatedAt = Timestamp.FromDateTime(DateTime.UtcNow),
+                    User = new Usergrpc
+                    {
+                        Name = user1.name ?? "",
+                        ImageUrl = user1.imageUrl ?? ""
+                    }
+                    
+                });
+              }
+              catch (Exception ex)
+              {
+                
+               Console.WriteLine($"Error sending gRPC comment notification: {ex.Message}");
+              }
+
+
+
+
             }
 
-            await _UserService.UpdateUser(user1._id.ToString(), user1);
-            await _UserService.UpdateUser(user2._id.ToString(), user2);
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            _ = await _UserService.UpdateUser(user1._id.ToString(), user1);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            _ = await _UserService.UpdateUser(user2._id.ToString(), user2);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
 
             return Ok(new {

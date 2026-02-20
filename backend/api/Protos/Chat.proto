@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+option csharp_namespace = "backend.Protos";
+
+service RealTimeChatService {
+    rpc SendMessage(MessageRequest) returns (MessageResponse) {}
+    rpc GetUserFollowingFollowers(UserID) returns (UsersIDsListResponse) {}
+}
+
+message MessageRequest {
+    string content = 1;
+    string sender = 2;
+    string recever = 3;
+}
+
+message MessageResponse {
+    string message = 1;
+}
+
+message UserID {
+    string userid = 1;
+}
+
+message UsersIDsListResponse {
+    repeated UserIDsList userIDsLists = 1;
+}
+
+message UserIDsList {
+    repeated string userIdsList = 1;
+}
+
+
+

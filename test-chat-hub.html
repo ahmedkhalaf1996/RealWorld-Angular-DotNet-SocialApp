@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Hub Tester</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .input-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        #log {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #00ff00;
+            padding-left: 10px;
+        }
+        .log-entry.error {
+            color: #ff6b6b;
+            border-left-color: #ff6b6b;
+        }
+        .log-entry.info {
+            color: #4dabf7;
+            border-left-color: #4dabf7;
+        }
+        .log-entry.success {
+            color: #51cf66;
+            border-left-color: #51cf66;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔌 Chat Hub Tester</h1>
+        
+        <div class="input-group">
+            <label for="userId">Your User ID:</label>
+            <input type="text" id="userId" placeholder="e.g., 69801cc67123633089740cf1" value="user123">
+        </div>
+
+        <div id="status" class="status disconnected">❌ Disconnected</div>
+
+        <button id="connectBtn" onclick="connect()">Connect to Chat Hub</button>
+        <button id="disconnectBtn" onclick="disconnect()" disabled>Disconnect</button>
+
+        <hr style="margin: 30px 0;">
+
+        <h2>📤 Send Private Message</h2>
+        <div class="input-group">
+            <label for="receiverId">Receiver User ID:</label>
+            <input type="text" id="receiverId" placeholder="e.g., user456">
+        </div>
+        <div class="input-group">
+            <label for="messageContent">Message:</label>
+            <textarea id="messageContent" rows="3" placeholder="Type your message here..."></textarea>
+        </div>
+        <button id="sendBtn" onclick="sendMessage()" disabled>Send Message</button>
+
+        <hr style="margin: 30px 0;">
+
+        <h2>📋 Event Log</h2>
+        <button onclick="clearLog()">Clear Log</button>
+        <div id="log"></div>
+    </div>
+
+    <script>
+        let connection = null;
+        let currentUserId = null;
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        function updateStatus(connected) {
+            const statusDiv = document.getElementById('status');
+            const connectBtn = document.getElementById('connectBtn');
+            const disconnectBtn = document.getElementById('disconnectBtn');
+            const sendBtn = document.getElementById('sendBtn');
+
+            if (connected) {
+                statusDiv.className = 'status connected';
+                statusDiv.textContent = '✅ Connected';
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                sendBtn.disabled = false;
+            } else {
+                statusDiv.className = 'status disconnected';
+                statusDiv.textContent = '❌ Disconnected';
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                sendBtn.disabled = true;
+            }
+        }
+
+        async function connect() {
+            currentUserId = document.getElementById('userId').value.trim();
+            
+            if (!currentUserId) {
+                alert('Please enter a User ID');
+                return;
+            }
+
+            log(`Connecting as user: ${currentUserId}...`, 'info');
+
+            connection = new signalR.HubConnectionBuilder()
+                .withUrl(`http://localhost:8001/hubs/chat?UserID=${currentUserId}`)
+                .configureLogging(signalR.LogLevel.Information)
+                .build();
+
+            // Handle events
+            connection.on("UserConnected", () => {
+                log(`✅ User ${currentUserId} connected to chat hub`, 'success');
+            });
+
+            connection.on(`OnlineUsers${currentUserId}`, (users) => {
+                log(`👥 Online users: ${JSON.stringify(users)}`, 'info');
+            });
+
+            connection.on("NewPrivateMessage", (message) => {
+                log(`💬 New message: ${JSON.stringify(message)}`, 'success');
+            });
+
+            connection.on("OpenPrivateChat", (message) => {
+                log(`📬 Private chat opened: ${JSON.stringify(message)}`, 'success');
+            });
+
+            connection.on("ClosePrivateChat", () => {
+                log(`🚪 Private chat closed`, 'info');
+            });
+
+            try {
+                await connection.start();
+                log('Chat connection started', 'success');
+                
+                // Add connection ID
+                await connection.invoke("AddUserConnectionId", currentUserId);
+                log(`Added connection ID for user: ${currentUserId}`, 'success');
+                
+                updateStatus(true);
+            } catch (err) {
+                log(`❌ Connection error: ${err}`, 'error');
+                updateStatus(false);
+            }
+        }
+
+        async function disconnect() {
+            if (connection) {
+                try {
+                    await connection.stop();
+                    log('Disconnected from chat hub', 'info');
+                    updateStatus(false);
+                } catch (err) {
+                    log(`❌ Disconnect error: ${err}`, 'error');
+                }
+            }
+        }
+
+        async function sendMessage() {
+            const receiverId = document.getElementById('receiverId').value.trim();
+            const content = document.getElementById('messageContent').value.trim();
+
+            if (!receiverId || !content) {
+                alert('Please enter receiver ID and message');
+                return;
+            }
+
+            const message = {
+                sender: currentUserId,
+                recever: receiverId,
+                content: content,
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                await connection.invoke("RecivePrivateMessage", message);
+                log(`📤 Message sent to ${receiverId}: ${content}`, 'success');
+                document.getElementById('messageContent').value = '';
+            } catch (err) {
+                log(`❌ Send error: ${err}`, 'error');
+            }
+        }
+
+        // Handle page unload
+        window.addEventListener('beforeunload', () => {
+            if (connection) {
+                connection.stop();
+            }
+        });
+    </script>
+</body>
+</html>
