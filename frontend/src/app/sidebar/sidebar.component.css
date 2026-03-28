@@ -1,0 +1,14 @@
+.sidebar-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--suface);
+  border-radius: 20px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-soft);
+}
+
+.sidebar-card h3 {
+  margin: 0;
+}

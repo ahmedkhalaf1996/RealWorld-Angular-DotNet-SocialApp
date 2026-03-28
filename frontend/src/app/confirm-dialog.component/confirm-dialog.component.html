@@ -1,0 +1,11 @@
+<div class="confirm-dialog">
+  <h2 class="confirm-title">{{ data?.title || 'Confirm action' }}</h2>
+  <p class="confirm-message">{{ data?.message || 'Are you Sure you Wat to continue?' }}</p>
+  <div class="confirm-actions">
+    <button mat-button (click)="cancel()">{{ data?.cancelText || 'Cancel' }}</button>
+    <button mat-raised-button color="warm" (click)="confirm()">
+      {{ data?.confirmText || 'Delete' }}
+    </button>
+  </div>
+
+</div>

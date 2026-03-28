@@ -1,0 +1,31 @@
+<div class="notification-container">
+  <mat-list>
+    @for(notification of notify;  track notification._id){
+    <mat-list-item [class.notifyread]="!notification?.isreded"
+    (click)="MoveToSource(notification)"
+    >
+    <div class="notify-row">
+      @if(notification.user?.avatar || notification.user?.imageUrl){
+      <img [src]="resolveImage(notification.user?.avatar || notification.user?.imageUrl)"
+      class="notify-avatar">
+      }
+    @if(!notification.user?.avatar && !notification.user?.imageUrl){
+      <mat-icon class="notify-icon">account_circle</mat-icon>
+    }
+
+    <div class="notify-body">
+      <h3>{{ notification.deatils }}</h3>
+      <div class="notify-meta">
+          <span>{{ notification.user?.name }}</span>
+          @if(notification.createdAt){
+              <span> {{ notification.createdAt | date: 'short'}} </span>
+          }
+      </div>
+    </div>
+    </div>
+
+    </mat-list-item>
+    }
+
+  </mat-list>
+</div>

@@ -1,0 +1,122 @@
+.appbar {
+  background: var(--surface);
+  color: var(--text);
+  border-bottom: 1px solid var(--line);
+  gap: 8px;
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: 0;
+  counter-reset: inherit;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.brand-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 6px rgba(255, 107, 107, 0.15);
+}
+
+
+.brand-name {
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+}
+
+.search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: (--surface-soft);
+  border-radius: 999px;
+  padding: 6px 14px;
+  max-width: 420px;
+  width: 100%;
+}
+
+.search-wrap input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  color: var(--text);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mobile-toggle {
+  display: none;
+}
+
+.nav-btn {
+  position: relative;
+}
+
+.badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: var(--primary);
+  color: white;
+  border-radius: 999px;
+  padding: 1px 6px;
+  font-size: 0.65rem;
+}
+
+.avatar-btn {
+  padding: 0;
+  border-radius: 999px;
+}
+
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  padding: 6px 16px env(safe-area-inset-bottom);
+  justify-content: space-between;
+  z-index: 1000;
+}
+
+@media (max-width: 840px) {
+  .search-wrap {
+    display: none;
+  }
+  .mobile-toggle {
+    display: inline-flex;
+  }
+  .mobile-nav {
+    display: flex;
+  }
+}

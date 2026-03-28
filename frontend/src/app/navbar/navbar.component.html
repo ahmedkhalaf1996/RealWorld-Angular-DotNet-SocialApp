@@ -1,0 +1,98 @@
+<mat-toolbar class="appbar stickyBar">
+  <div class="nav-left">
+    <button mat-icon-button class="mobile-toggle" [matMenuTriggerFor]="mobileMenu">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <button class="brand" routerLink="/">
+      <span class="brand-dot"></span>
+      <span class="brand-name">Social Network</span>
+    </button>
+
+  </div>
+
+  <div class="nav-center">
+    <div class="search-wrap">
+      <mat-icon >search</mat-icon>
+      <input type="search" [formControl]="searchControl" (keyup.enter)="Search(searchControl.value)"
+      placeholder="Search people or posts">
+    </div>
+  </div>
+
+
+  @if(userNavService.isAuthenticated){
+  <div class="nav-right" >
+    <button mat-icon-button class="nav-btn" [routerLink]="['/chat/']">
+      <mat-icon>chat_bubble</mat-icon>
+      @if(unreadChatCount != 0){
+        <span class="badge">{{ unreadChatCount }}</span>
+      }
+    </button>
+
+    <button mat-icon-button class="nav-btn" [routerLink]="['/notifications/']">
+      <mat-icon>{{unreadNotifyCount > 0 ? 'notifications_active' : 'notifications'}}</mat-icon>
+      @if(unreadNotifyCount != 0){
+        <span class="badge">{{ unreadNotifyCount }}</span>
+      }
+    </button>
+
+    <button mat-icon-button [matMenuTriggerFor]="beforeMenu" class="avatar-btn">
+      <img [src]="resolveImage(this.userNavService.UserServiceData.imageUrl)" class="avatar-sm">
+    </button>
+    <mat-menu #beforeMenu="matMenu" xPosition="before">
+      <button mat-menu-item [routerLink]="['/profile/', this.userNavService.UserServiceData._id]">Profile</button>
+      <button mat-menu-item (click)="logUserOut()">Logout</button>
+    </mat-menu>
+
+
+  </div>
+
+  } @else {
+    <ng-template>
+      <button mat-raised-button color="primary" routerLink="/auth">Sign In</button>
+    </ng-template>
+  }
+
+</mat-toolbar>
+
+<mat-menu #mobileMenu="matMenu" class="mobile-menu">
+  <button mat-menu-item routerLink="/">Home</button>
+  <button mat-menu-item routerLink="/search">Searh</button>
+  @if(userNavService.isAuthenticated){
+      <button mat-menu-item routerLink="/chat">Chat</button>
+      <button mat-menu-item [routerLink]="['/profile/', userNavService.UserServiceData._id]">Profile</button>
+      <button mat-menu-item routerLink="/notifications">Notifications</button>
+        <button mat-menu-item (click)="logUserOut()">Logout</button>
+
+  }
+  @if(!userNavService.isAuthenticated){
+      <button mat-menu-item routerLink="/auth">Sign In</button>
+  }
+
+</mat-menu>
+
+@if(userNavService.isAuthenticated){
+<nav class="mobile-nav" >
+  <button mat-icon-button routerLink="/">
+    <mat-icon>home</mat-icon>
+  </button>
+    <button mat-icon-button routerLink="/search">
+    <mat-icon>search</mat-icon>
+  </button>
+    <button mat-icon-button routerLink="/chat">
+    <mat-icon>chat_bubble</mat-icon>
+    @if(unreadChatCount != 0){
+    <span class="badge">{{ unreadChatCount}}</span>
+    }
+  </button>
+      <button mat-icon-button routerLink="/notifications">
+    <mat-icon>notifications</mat-icon>
+    @if(unreadNotifyCount != 0){
+    <span class="badge">{{ unreadNotifyCount}}</span>
+    }
+  </button>
+  <button mat-icon-button [routerLink]="['/profile/', userNavService.UserServiceData._id]">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+</nav>
+}

@@ -8,3 +8,12 @@
 
 /backend/realtimeNotification/obj
 /backend/realtimeNotification/bin
+
+
+frontend/dist
+frontend/node_modules
+frontend/tmp
+frontend/.vscode
+frontend/.eidtorconfig
+
+

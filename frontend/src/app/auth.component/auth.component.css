@@ -1,0 +1,18 @@
+.auth-shell {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280xp, 1fr));
+  gap: 20px;
+}
+
+.auth-card {
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-soft);
+  padding: 16px;
+}
+
+.auth-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160xp, 1fr));
+  gap: 10px;
+}

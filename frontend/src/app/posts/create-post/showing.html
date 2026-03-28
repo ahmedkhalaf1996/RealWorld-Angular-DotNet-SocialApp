@@ -1,0 +1,30 @@
+<h1 mat-dialog-title>Create New Post</h1>
+<div mat-dialog-content class="dialog">
+  <form class="show-from">
+    <mat-form-field class="show-full-width" appearance="fill">
+      <mat-label>Title</mat-label>
+      <input name="title" [(ngModel)]="data.title" matInput placeholder="Post title">
+    </mat-form-field>
+
+    <mat-form-field class="show-full-width" appearance="fill">
+      <mat-label>What's on your mind?</mat-label>
+      <textarea name="body" [(ngModel)]="data.message" matInput placeholder="Share something ..."></textarea>
+    </mat-form-field>
+
+    <div class="upload-row">
+      <button mat-stroked-button color="primary" (click)="uploadFile.click()">Slelect Image</button>
+      <input name="uploadFile" (change)="upload($event)" #uploadFile type="file" style="display: none;" />
+    </div>
+
+    @if(data.selectedFile){
+    <div class="preview">
+      <img [src]="this.data.selectedFile" alt="preview">
+    </div>
+    }
+
+    <div class="pt5">
+      <button (click)="CreatePost()" mat-raised-button color="primary">Create</button>
+    </div>
+
+  </form>
+</div>

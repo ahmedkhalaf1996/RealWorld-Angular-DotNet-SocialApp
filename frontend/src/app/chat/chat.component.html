@@ -1,0 +1,109 @@
+<div class="chat-room">
+  <div class="user-list">
+    <mat-list>
+      @for(user of FrindsListUsers;  track user._id){
+      <mat-list-item (click)="selectUser(user)">
+        @if(user?.imageUrl){
+        <img [src]="resolveImage(user?.imageUrl)" class="avatar-sm-xc">
+
+        }
+        @if(!user?.imageUrl){
+          <mat-icon class="user-avatar">account_circle</mat-icon>
+        }
+
+        <span>{{ user.name }}</span>
+        @if(user._id && isUserOnline(user._id)){
+          <span class="online-indicator"></span>
+          <span class="spacerx"></span>
+          @if(user.unReadedMessage !=0) {
+             <span class="unread-badge">{{ user.unReadedMessage }}</span>
+          }
+        }
+      </mat-list-item>
+      }
+
+    </mat-list>
+  </div>
+
+  <div class="chat-box">
+    <div class="chat-header">
+      @if(selectedUser && selectedUser._id){
+        <div class="user-info">
+            @if(selectedUser.imageUrl){
+            <img [src]="resolveImage(selectedUser.imageUrl)" class="avatar-sm-xc">
+
+            } @else {
+              <mat-icon class="user-avatar" >account_circle</mat-icon>
+            }
+            <div class="spacerx"></div>
+            <span class="username">{{ selectedUser.name }}</span>
+            @if(selectedUser._id && isUserOnline(selectedUser._id)){
+              <span class="status">Online</span>
+            }
+        </div>
+      } @else {
+        <ng-template>
+          <div class="user-info placeholder">
+            <mat-icon>chat_bubble_outline</mat-icon>
+            <span>Select A Conversation to start chatting.</span>
+          </div>
+        </ng-template>
+      }
+    </div>
+    <div class="chat-content" #chatContent (scroll)="OnScrollGetOldMessages()">
+      <mat-list>
+      @for(message of chatMessage; track trackMessage($index, message) ){
+        <mat-list-item>
+          <div class="message" [ngClass]="{'sender': message.sender === MainUser._id}">
+            @if(message.sender === MainUser._id){
+               <ng-container>
+
+              @if(MainUser.imageUrl){
+              <img [src]="resolveImage(MainUser.imageUrl)" class="avatar-sm-xc">
+
+              } @else {
+               <mat-icon class="user-avatar" >account_circle</mat-icon>
+              }
+              </ng-container>
+            }
+
+            @if(message.sender != MainUser._id){
+               <ng-container>
+
+              @if(selectedUser.imageUrl){
+              <img [src]="resolveImage(selectedUser.imageUrl)" class="avatar-sm-xc">
+
+              } @else {
+               <mat-icon class="user-avatar" >account_circle</mat-icon>
+              }
+              </ng-container>
+            }
+
+            <p>{{ message.content }}</p>
+
+          </div>
+        </mat-list-item>
+      }
+      </mat-list>
+    </div>
+   @if(showNewMessageIndicator){
+     <button class="new-msg-indicator" mat-stroked-button color="primary" (click)="jumpToBottom()">
+      New messages
+    </button>
+   }
+   @if(selectedUser && selectedUser._id){
+    <div class="chat-input">
+      <mat-form-field appearance="fill">
+         <mat-label>Message</mat-label>
+         <input (keyup.enter)="sendMessage()" matInput [(ngModel)]="newMessage" placeholder="Type your message"
+          type="text">
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="sendMessage()">Send</button>
+    </div>
+   }
+  </div>
+
+
+
+
+</div>

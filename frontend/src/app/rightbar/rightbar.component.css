@@ -1,0 +1,139 @@
+.rightbar-card {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-soft);
+  min-height: 520px;
+}
+
+.rightbar-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.rightbar-card h3 {
+  margin: 0 0 4px 0;
+}
+
+.rightbar-card p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+}
+
+.rightbar-count {
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.sug-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  max-height: 540px;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.sug-card {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  grid-template-areas:
+    "avatar info"
+    "avatar action";
+  gap: 8px 12px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--surface-soft);
+  cursor: pointer;
+}
+
+.sug-card:hover {
+  background: #f3f6fb;
+}
+
+.sug-avatar {
+  grid-area: avatar;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #e8edf6;
+  display: grid;
+  place-items: center;
+}
+
+.sug-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sug-avatar mat-icon {
+  font-size: 36px;
+  color: var(--text-soft);
+}
+
+.sug-info {
+  grid-area: info;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sug-name {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sug-sub {
+  color: var(--text-soft);
+  font-size: 0.85rem;
+}
+
+.sug-follow {
+  grid-area: action;
+  justify-self: start;
+}
+
+.empty-state {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px dashed var(--line);
+  color: var(--text-soft);
+}
+
+.empty-title {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.empty-sub {
+  font-size: 0.85rem;
+}
+
+@media (max-width: 900px) {
+  .rightbar-card {
+    min-height: auto;
+  }
+
+  .sug-grid {
+    max-height: none;
+    grid-template-columns: 1fr;
+  }
+}

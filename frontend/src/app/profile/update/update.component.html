@@ -1,0 +1,27 @@
+<form class="show-form">
+  <mat-form-field class="show-full-width" appearance="fill">
+    <mat-label>Name</mat-label>
+    <input name="name" [(ngModel)]="user.name" matInput placeholder="name">
+  </mat-form-field>
+
+  <mat-form-field class="show-full-width" appearance="fill">
+    <mat-label>bio..</mat-label>
+    <textarea name="bio" [(ngModel)]="user.bio" matInput placeholder="bio"> </textarea>
+  </mat-form-field>
+
+
+  @if(user.imageUrl){
+  <div class="preview" >
+    <img [src]="resolveImage(user.imageUrl)" alt="preview">
+  </div>
+  }
+
+    <div  (click)="uploadFile.click()">
+    <button mat-raised-button color="primary">Select Image</button>
+    <input name="uploadFile" (change)="upload($event)" #uploadFile type="file" style="display: none;" />
+  </div>
+  <div class="pt5">
+    <button (click)="Update()" mat-raised-button color="primary">Update</button>
+  </div>
+
+</form>

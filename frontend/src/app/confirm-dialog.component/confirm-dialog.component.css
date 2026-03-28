@@ -1,0 +1,20 @@
+.confirm-dialog {
+  padding: 8px 4px;
+  max-width: 360px;
+}
+
+.confirm-title {
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+}
+
+.confirm-message {
+  margin: 0 0 16px 0;
+  color: var(--text-soft);
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

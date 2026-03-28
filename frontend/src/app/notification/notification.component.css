@@ -1,0 +1,75 @@
+.notification-container {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: var(--sureface);
+  border-radius: 20px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--line);
+}
+
+.notification-container mat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+mat-list-item {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--sureface-soft);
+  height: auto;
+}
+
+
+mat-list-item:hover {
+  cursor: pointer;
+  background: var(--sureface);
+}
+
+.notify-row {
+ display: flex;
+ align-items:  center;
+ gap: 12px;
+ width: 100%;
+}
+
+.notify-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  flex: 0 0 32px;
+}
+
+
+.notify-icon {
+  font-size: 32px;
+  color: var(--primary);
+  flex: 0 0 32px;
+}
+
+
+.notify-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.notify-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  font-size: 14px;
+  color: var(--text-muted);
+}

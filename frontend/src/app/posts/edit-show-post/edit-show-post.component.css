@@ -1,0 +1,38 @@
+.single-post-shell {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.post-actions-bar {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.single-post-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.edit-card {
+  background: var(--sureface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: var(--shadow-soft);
+}
+
+
+.edit-card .preview img {
+  width: 100%;
+  max-height: 520px;
+  object-fit: cover;
+}
+
+.single-post-card .post-media img {
+  width: 100%;
+}

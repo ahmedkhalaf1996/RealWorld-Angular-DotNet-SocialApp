@@ -1,0 +1,57 @@
+@if(usersService.isAuthenticated){
+
+  <section class="rightbar-card">
+    <div class="rightbar-header">
+      <div>
+        <h3>Suggestions For You</h3>
+        <p>People you may want to follow.</p>
+      </div>
+
+      @if(sugUsersList?.length > 0){
+        <span class="rightbar-count">{{ sugUsersList.length }}</span>
+      }
+    </div>
+
+    @if(sugUsersList?.length > 0){
+      <div class="sug-grid">
+      @for(user of sugUsersList; track user._id){
+      <article class="sug-card" (click)="MoveToUserPage(user._id)">
+        <div class="sug-avatar">
+          @if(user?.imageUrl){
+            <img [src]="resolveImage(user.imageUrl)" alt="">
+          } @else {
+            <mat-icon>account_circle</mat-icon>
+          }
+        </div>
+        <div class="sug-info">
+          <div class="sug-name">{{ user?.name }}</div>
+          <div class="sug-sub">View Profile</div>
+        </div>
+        <button mat-stroked-button color="primary" class="sug-follow" (click)="followUser($event, user)">
+          Follow
+        </button>
+      </article>
+
+      }
+      </div>
+    } @else {
+      <div class="empty-state">
+        <mat-icon>people_outline</mat-icon>
+        <div>
+          <div class="empty-title">No Suggestions yet</div>
+          <div class="empty-sub">Follow a few People to get more.</div>
+        </div>
+      </div>
+    }
+
+  </section>
+
+} @else {
+  <div class="empty-state">
+    <mat-icon>lock</mat-icon>
+    <div>
+      <div class="empty-title">Login required</div>
+      <div class="empty-sub">Please log in to see suggestions.</div>
+    </div>
+  </div>
+}

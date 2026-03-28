@@ -57,9 +57,64 @@ namespace realTimeServices.Hubs
             {
                 _chatService.AddUserConnectionId(id, Context.ConnectionId);
                 await DisplayOnlineOtherUsers(id);
+                await NotifyAllConnectedUsersToRefresh(id);
             }
         }
 
+        private async Task NotifyAllConnectedUsersToRefresh(string newlyConnectedUserId)
+        {
+            if(newlyConnectedUserId != "" && newlyConnectedUserId != "undefind" && newlyConnectedUserId is not null)
+            {
+                var uidlistfromRooms = _chatService.GetOnlyUserRooms(newlyConnectedUserId);
+                if(uidlistfromRooms != null)
+                {
+                    foreach(var uid in uidlistfromRooms)
+                    {
+                        await Clients.Group(uid).SendAsync("RefreshOnlineUsersNeeded", newlyConnectedUserId);
+                    }
+                }
+            }
+        }
+
+
+        public async Task RefreshUserRooms(string userId)
+        {
+            if(userId != "" && userId != "undefind" && userId is not null)
+            {
+                var oldRooms = _chatService.GetOnlyUserRooms(userId);
+                if(oldRooms != null)
+                {
+                    foreach(var room in oldRooms)
+                    {
+                        await Groups.RemoveFromGroupAsync(Context.ConnectionId, room);
+                    }
+                }
+
+                var updatedRooms = _chatService.AddAndGetUserRooms(userId);
+
+                // 
+                foreach(var room in updatedRooms)
+                {
+                    await Groups.AddToGroupAsync(Context.ConnectionId, room);
+                }
+
+                await NotifyAllConnectedUsersToRefresh(userId);
+            }
+        }
+
+        public string[] GetOnlineUsersStatus(string userId)
+        {
+         if(userId != "" && userId != "undefind" && userId is not null)
+            {
+                var onlineUsers = _chatService.GetOnlineUsers(userId);
+                if(onlineUsers != null)
+                {
+                    var filterdOnlineUsers = onlineUsers.Where(u => u != userId).ToArray();
+                    return filterdOnlineUsers;
+                }
+            }
+            return new string[] {};
+        }
         private async Task DisplayOnlineOtherUsers(string id)
         {
             Console.WriteLine($"Display online called id {id}");
@@ -79,6 +134,7 @@ namespace realTimeServices.Hubs
             }
 
         }
+
 
         public async Task RecivePrivateMessage(MessageDto message)
         {

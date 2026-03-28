@@ -34,7 +34,8 @@ namespace realTimeServices.Services
                 {
                   if (room.Room.ContainsKey(id))
                     {
-                        uides.Add(id);
+                        //uides.Add(id);
+                        if (!uides.Contains(id)) uides.Add(id);
                     }  
                 });
 
@@ -51,7 +52,8 @@ namespace realTimeServices.Services
                 {
                     if (room.Room.ContainsKey(uid))
                     {
-                        room.Room[uid].Add(userid);
+                        // room.Room[uid].Add(userid);
+                        if (!room.Room[uid].Contains(userid)) room.Room[uid].Add(userid);
                     }
                 }
 

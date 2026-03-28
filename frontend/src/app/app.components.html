@@ -1,0 +1,14 @@
+<div class="app-shell">
+  <app-navbar></app-navbar>
+  <main class="app-main">
+    <router-outlet></router-outlet>
+  </main>
+
+  @if(this.AppusersService.isAuthenticated){
+    <ng-container >
+      <app-create-post></app-create-post>
+    </ng-container>
+  }
+</div>
+
+
