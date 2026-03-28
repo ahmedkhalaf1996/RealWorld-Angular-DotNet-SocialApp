@@ -1,0 +1,56 @@
+<section class="single-post-shell">
+  @if(if_UserIsTheCreator){
+  <div class="post-actions-bar" >
+    <button mat-stroked-button color="primary" (click)="IS_Edit = true">
+      <mat-icon>edit</mat-icon>
+      Edit Post
+    </button>
+    <button mat-stroked-button color="warm" (click)="Delete()">
+      <mat-icon>delete</mat-icon>
+      Delete
+    </button>
+  </div>
+  }
+
+  <div class="single-post-content">
+    @if(IS_Edit){
+      <div mat-dialog-content class="dialog edit-card">
+        <form class="show-form">
+          <mat-form-field class="show-full-width" appearance="fill">
+            <mat-label>Title</mat-label>
+            <input name="title" [(ngModel)]="post.title" matInput placeholder="Title">
+          </mat-form-field>
+
+          <mat-form-field class="show-full-width" appearance="fill">
+            <mat-label>What's on your mind</mat-label>
+            <textarea name="message" [(ngModel)]="post.message" matInput placeholder="Ex. it make me feel...">
+            </textarea>
+          </mat-form-field>
+
+          <div class="preview">
+            <img [src]="this.post.selectedFile" alt="">
+          </div>
+          <div class="upload-row" (click)="uploadFile.click()">
+            <button mat-raised-button color="primary">Select Image</button>
+            <input name="uploadFile" (change)="upload($event)" #uploadFile type="file" style="display: none;" />
+          </div>
+          <div class="pt5">
+            <button (click)="UpdateAndSave()" mat-raised-button color="primary">Save</button>
+          </div>
+        </form>
+      </div>
+    }
+
+    @if(post._id != null){
+      <ng-container>
+        @if(!IS_Edit){
+          <app-post class="single-post-card" [IsShowEdit]="true" [post]="post"></app-post>
+        }
+      </ng-container>
+    }
+
+  </div>
+
+</section>
+
+

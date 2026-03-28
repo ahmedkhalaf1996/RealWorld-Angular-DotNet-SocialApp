@@ -1,0 +1,49 @@
+<section class="feed-layout">
+  <aside class="left-rail">
+   <app-sidebar></app-sidebar>
+
+  </aside>
+  <main class="feed">
+    @if (userHomeService.isAuthenticated) {
+     <ng-container>
+       <div class="feed-header">
+          <div>
+             <h2>Home</h2>
+             <p>Latest updates form people you follow</p>
+          </div>
+       </div>
+
+       @if(!isLoading && posts.length ===0) {
+         <div class="empty-state">
+          <h3>No posts yet</h3>
+          <p>Follow more peopel or create your first post to see updats here.</p>
+         </div>
+       } @else {
+         <ng-container *ngFor="let post of posts">
+          <app-post [post]="post"></app-post>
+         </ng-container>
+
+         @if(isLoading){
+          <div class="feed-status">loading more posts..</div>
+         }
+         @if(!isLoading && !hasMore && posts.length> 0) {
+            <div class="feed-status">You ar all caght up.</div>
+         }
+
+         <div #feedEnd class="feed-end"></div>
+       }
+
+     </ng-container>
+    } @else {
+        <div class="empty-state">
+          <h2>Welcome Back</h2>
+          <p>Sign in to see your feed and post udpates form people you follow.</p>
+          <a mat-raised-button color="primary" routerLink="/auth">Go to login</a>
+        </div>
+    }
+
+  </main>
+    <aside class="right-rail">
+    <app-rightbar></app-rightbar>
+  </aside>
+</section>

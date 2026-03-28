@@ -1,0 +1,42 @@
+<div class="auth-shell">
+  <mat-card class="auth-card">
+    <h1>Sign In</h1>
+    <form (ngSubmit)="Login()">
+      <mat-form-field class="full-width" appearance="fill">
+        <mat-label>Email</mat-label>
+        <input name="email" [(ngModel)]="loginForm.email" type="email" matInput>
+      </mat-form-field>
+      <mat-form-field class="full-width" appearance="fill">
+        <mat-label>Password</mat-label>
+        <input name="password" [(ngModel)]="loginForm.password" type="password" matInput>
+      </mat-form-field>
+      <button [disabled]="loadLogin" mat-raised-button color="primary" class="full-width">Login</button>
+    </form>
+  </mat-card>
+  <!-- register user  -->
+  <mat-card class="auth-card">
+    <h1>Sign Up</h1>
+    <form (ngSubmit)="Register()">
+      <div class="auth-grid">
+              <mat-form-field class="full-width-input" appearance="fill">
+        <mat-label>First name</mat-label>
+        <input name="firstName" [(ngModel)]="SiginUpForm.firstName"  matInput>
+      </mat-form-field>
+      <mat-form-field class="full-width-input" appearance="fill">
+        <mat-label>Last Name </mat-label>
+        <input name="lastname" [(ngModel)]="SiginUpForm.lastName" matInput>
+      </mat-form-field>
+      <mat-form-field class="full-width-input" appearance="fill">
+        <mat-label>Email</mat-label>
+        <input name="email" [(ngModel)]="SiginUpForm.email" type="email" matInput>
+      </mat-form-field>
+      <mat-form-field class="full-width-input" appearance="fill">
+        <mat-label>Password</mat-label>
+        <input name="password" [(ngModel)]="SiginUpForm.password" type="password" matInput>
+      </mat-form-field>
+      </div>
+            <button [disabled]="loadSiginup" mat-raised-button color="primary" class="full-width">Sign Up</button>
+    </form>
+  </mat-card>
+</div>
+

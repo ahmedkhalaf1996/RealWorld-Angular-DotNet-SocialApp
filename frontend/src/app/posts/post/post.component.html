@@ -1,0 +1,82 @@
+<mat-card class="post-card" >
+
+  @if(!inProfile){
+  <mat-card-header class="post-header">
+    <div mat-card-avatar class="post-avatar">
+      <img [src]="resolveImage(CreatorUser.imageUrl)" mat-button class="avatar-sm">
+    </div>
+    <mat-card-title class="post-author">{{ CreatorUser.name }}</mat-card-title>
+    <mat-card-subtitle > {{ post.createdAt | date:'mediumDate' }} </mat-card-subtitle>
+  </mat-card-header>
+
+  }
+
+
+  @if(post.selectedFile){
+
+  <div class="post-media"  (click)="GotoDeatils()">
+    <img mat-card-sm-image class="{{ inProfile ? 'ProfilePostsImage': 'ProfilePostsImage' }}" [src]="postImageSrc" alt="" >
+  </div>
+  }
+
+
+  @if(!inProfile){
+    <mat-card-content class="post-body">
+      <div class="post-meta">
+        <button class="iconButton" (click)="LovePost()" mat-icon-button>
+          <mat-icon class="love-icon" [color]="isLoved ? 'warn' : ''">favorite</mat-icon>
+        </button>
+        <span class="meta-count">{{ post.likes?.length || 0 }}</span>
+      </div>
+
+      <h2 class="post-title">{{post.title}}</h2>
+      <p class="post-message"> {{ post.message }} </p>
+      <!-- comments -->
+       @if(commentsList.length > 0) {
+        <div class="post-comments">
+
+          <div class="comment" *ngFor="let com of visibleComments">
+            <img class="comment-avatar" [src]="resolveImage(com.user?.imageUrl)" alt="">
+            <div class="comment-body">
+              <div class="comment-head">
+              <span class="comment-name"> {{ com.user?.name || 'User' }} </span>
+              <span class="comment-date"> {{ com.createdAt | date: 'short'}} </span>
+              </div>
+              <p class="comment-text"> {{ com.value }} </p>
+          </div>
+          @if(canDeleteComment(com)){
+            <button mat-icon-button class="comment-delete" (click)="deleteComment(com)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          }
+        </div>
+
+        @if(commentsList.length > 2 && !IsShowEdit) {
+          <button class="comment-toggle" (click)="toogleComments()">
+            {{ showAllComments ? 'Show less': "show More" }}
+          </button>
+        }
+        </div>
+       }
+    </mat-card-content>
+  }
+
+  <mat-card-actions class="post-actions">
+    <form class="comment-form">
+      <mat-form-field class="full-width" appearance="fill">
+        <input
+          type="text"
+          name="comment"
+          [(ngModel)]="AddComment"
+          matInput
+          placeholder="Add a Comment">
+        @if(AddComment){
+        <mat-icon (click)="addCommentToPost()" matSuffix >send</mat-icon>
+
+        }
+      </mat-form-field>
+    </form>
+  </mat-card-actions>
+
+
+</mat-card>

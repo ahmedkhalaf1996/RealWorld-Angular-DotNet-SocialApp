@@ -1,0 +1,14 @@
+<div class="sidebar-card">
+  <h3>Quick Acess</h3>
+  @if(usersService.isAuthenticated){
+    <button [routerLink]="['/profile', userid]" mat-stroked-button color="primary">
+      <mat-icon>account_circle</mat-icon>
+      Profile
+    </button>
+  } @else {
+    <button routerLink="/auth" mat-stroked-button color="warn">
+      <mat-icon>login</mat-icon>
+      Sign In
+    </button>
+  }
+</div>

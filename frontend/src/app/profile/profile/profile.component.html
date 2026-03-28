@@ -1,0 +1,74 @@
+<section class="profile-shell">
+  <div class="profile-card">
+    <div class="profile-avatar">
+      <img [src]="resolveImage(userData.imageUrl)" mat-button class="avatar-profile" >
+    </div>
+
+    @if(!edit){
+    <div class="profile-main" >
+      <div class="profile-top">
+        <h1>{{ userData.name }}</h1>
+        <div class="profile-actions">
+          @if(isSameUser){
+            <button mat-raised-button color="accent" (click)="edit = !edit">Edit</button>
+          }
+          @if(!isSameUser){
+            <button mat-raised-button [color]="isFollow ? 'primary': 'accent'"
+            (click)="follow()">{{ isFollow ? 'Unfollow' : 'Follow' }}</button>
+          }
+        </div>
+      </div>
+
+      <p class="profile-bio">{{ userData.bio }}</p>
+
+
+      @if(userData.followers && userData.following){
+        <div class="profile-stats">
+          <div>
+            <strong>{{ totalPosts }}</strong>
+            <span>Posts</span>
+          </div>
+          <div>
+            <strong>{{ userData.followers.length || 0 }}</strong>
+            <span>Followers</span>
+          </div>
+          <div>
+            <strong>{{ userData.following.length || 0 }}</strong>
+            <span>Following</span>
+          </div>
+        </div>
+      }
+
+    </div>
+    }
+
+    @if(edit) {
+      <div class="profile-main">
+        <app-update [user]="userData" (ChangeUpdate)="Update()"></app-update>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="profile-posts">
+ <h2 class="section-title">Posts</h2>
+ @if(!isLoading && posts.length === 0){
+  <div class="empty-state">
+    <h3>No Posts Yet</h3>
+    <p>This Profile dose not have any posts yes.</p>
+  </div>
+ }
+
+  <div class="posts-grid">
+
+    @for(post of posts; track post._id){
+    <app-post [inProfile]="true" [post]="post"></app-post>
+    }
+    </div>
+
+  @if(isLoading){
+    <div class="feed-status">Loading more posts...</div>
+  }
+  <div #profileEnd class="feed-end"></div>
+</section>
+

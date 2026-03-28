@@ -1,0 +1,64 @@
+@if(vm$ | async; as vm){
+  <div class="search-shell">
+    <div class="search-header">
+      <div>
+        <h1>Search</h1>
+        <p>Find People and Posts Across Your NetWork.</p>
+      </div>
+      <mat-slide-toggle [checked]="vm.showPosts" (change)="changeSearch($event)" color="primary">
+          Show {{ vm.showPosts ? 'users' : 'posts' }}
+      </mat-slide-toggle>
+    </div>
+
+    @if(vm.showPosts){
+    <div class="search-results">
+      @if(vm.posts.length === 0){
+        <div class="empty-state">
+          <h3>No Posts Found</h3>
+          <p>Try a diffrent keyword.</p>
+        </div>
+      }
+      @for(data of vm.posts; track data._id){
+        <div class="post-result" [routerLink]="['/EditShowPost/', data._id]">
+          @if(data.selectedFile){
+            <div class="post-preview">
+              <img [src]="resolveImage(data.selectedFile)" alt="">
+            </div>
+            <div class="post-info">
+              <h3>{{ data.title }}</h3>
+              <p> {{ data.message }} </p>
+            </div>
+          }
+        </div>
+      }
+    </div>
+    }
+
+    @if(!vm.showPosts){
+      @if(vm.users.length === 0){
+      <div class="empty-state">
+          <h3>No Users Found</h3>
+          <p>Try a diffrent keyword.</p>
+      </div>
+      }
+      @for(data of vm.users; track data._id){
+        <div class="user-card" [routerLink]="['/profile/', data._id]">
+          @if(data.imageUrl){
+              <img [src]="resolveImage(data.imageUrl)" alt="">
+          } @else {
+            <mat-icon>account_circle</mat-icon>
+          }
+
+            <div class="post-info">
+              <h3>{{ data.name }}</h3>
+              <p> {{ data.bio }} </p>
+            </div>
+            <mat-icon>chevron_right</mat-icon>
+        </div>
+      }
+    }
+
+
+
+  </div>
+}
