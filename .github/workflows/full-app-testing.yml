@@ -30,3 +30,43 @@ jobs:
 
       - name: Run API Tests
         run: dotnet test backend/api.Tests/api.Tests.csproj  
+  
+# realtime Chat Tests
+  realtime-chat-tests:
+    name: realtime chat Tests
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code 
+        uses: actions/checkout@v4 
+        with:
+          dotnet-version: '10.9.x'
+      
+      - name: Restore Dependencies
+        run: dotnet restore backend/realTimeChat/realTimeChat.csproj
+
+      - name: Build Backend realTimeChat
+        run: dotnet build backend/realTimeChat/realTimeChat.csproj --configuration Release --no-restore
+
+      - name: Run realTimeChat Tests
+        run: dotnet test backend/realTimeChat.Tests/realTimeChat.Tests.csproj
+
+# realtime notification Tests
+  realtime-notification-tests:
+    name: realtime notification Tests
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code 
+        uses: actions/checkout@v4 
+        with:
+          dotnet-version: '10.9.x'
+      
+      - name: Restore Dependencies
+        run: dotnet restore backend/realtimeNotification/realtimeNotification.csproj
+
+      - name: Build Backend realtimeNotification
+        run: dotnet build backend/realtimeNotification/realtimeNotification.csproj --configuration Release --no-restore
+
+      - name: Run realtimeNotification Tests
+        run: dotnet test backend/realtimeNotification.Tests/realtimeNotification.Tests.csproj
