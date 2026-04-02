@@ -96,4 +96,4 @@ jobs:
 
       - name: Run Cypress Tests
         working-directory: ./frontend
-        run: npm run e2e:run -- --headless --browser chrome
+        run: npm run e2e:ci
