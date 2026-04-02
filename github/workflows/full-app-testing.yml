@@ -1,0 +1,31 @@
+name: Full Application Testing - Api - Realtime, frontend 
+
+on:
+  push:
+    branches: 
+      - main
+      - auto-testing
+  pull_request:
+      - main
+      - auto-testing
+
+jobs:
+  # Backend Api Tests
+  backend-api-tests:
+    name: Backend API Tests
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code 
+        uses: actions/checkout@v4 
+        with:
+          dotnet-version: '10.9.x'
+      
+      - name: Restore Dependencies
+        run: dotnet restore backend/api/api.csproj
+
+      - name: Build Backend Api
+        run: dotnet build backend/api/api.csproj --configuration Release --no-restore
+
+      - name: Run API Tests
+        run: dotnet test backend/api.Tests/api.TEsts.csproj  
