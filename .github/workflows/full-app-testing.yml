@@ -70,3 +70,30 @@ jobs:
 
       - name: Run realtimeNotification Tests
         run: dotnet test backend/realtimeNotification.Tests/realtimeNotification.Tests.csproj
+
+# Frontend Cypress Tests 
+  frontend-e2e-tests:
+    name: Frontend E2E Tests (Cypress)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code 
+        uses: actions/checkout@v4 
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+      
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+      
+
+      - name: Build Angular app
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Run Cypress Tests
+        working-directory: ./frontend
+        run: npm run e2e:run -- --headless --browser chrome
