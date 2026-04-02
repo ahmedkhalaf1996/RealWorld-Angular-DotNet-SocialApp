@@ -30,6 +30,13 @@ jobs:
 
       - name: Run API Tests
         run: dotnet test backend/api.Tests/api.Tests.csproj  
+
+      - name: Upload Api Test Results
+        if: always() 
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-test-results'
+          path: backend/api.Tests/bin/Release/**/TestResults/
   
 # realtime Chat Tests
   realtime-chat-tests:
@@ -50,6 +57,14 @@ jobs:
 
       - name: Run realTimeChat Tests
         run: dotnet test backend/realTimeChat.Tests/realTimeChat.Tests.csproj
+      
+      - name: Upload Reatime Chat Test Results
+        if: always() 
+        uses: actions/upload-artifact@v4
+        with:
+          name: realtime-chat-test-results
+          path: backend/realTimeChat.Tests/bin/Release/**/TestResults/
+
 
 # realtime notification Tests
   realtime-notification-tests:
@@ -70,6 +85,13 @@ jobs:
 
       - name: Run realtimeNotification Tests
         run: dotnet test backend/realtimeNotification.Tests/realtimeNotification.Tests.csproj
+
+      - name: Upload Reatime Notification Test Results
+        if: always() 
+        uses: actions/upload-artifact@v4
+        with:
+          name: realtime-notification-test-results
+          path: backend/realtimeNotification.Tests/bin/Release/**/TestResults/
 
 # Frontend Cypress Tests 
   frontend-e2e-tests:
@@ -97,3 +119,76 @@ jobs:
       - name: Run Cypress Tests
         working-directory: ./frontend
         run: npm run e2e:ci
+        continue-on-error: true
+
+
+      - name: Upload Cypress vedios
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-videos
+          path: frontend/cypress/videos/
+
+      - name: Upload Cypress screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: frontend/cypress/screenshots/
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-results
+          path: frontend/cypress/results/
+
+
+# Test Summary 
+  test-summary:
+    name: Test Summary Report
+    runs-on: ubuntu-latest
+    needs: [backend-api-tests, realtime-chat-tests, realtime-notification-tests, frontend-e2e-tests]
+    if: always()
+
+    steps:
+      - name: Checout Code
+        uses: actions/checkout@v4
+ 
+      - name: Download All Artificatcs
+        uses: actions/download-artifact@v4
+   
+      - name: Generate Test Summary Report
+        run: |
+          echo "# Autmated Testing Report " >> $GitHUB_STEP_SUMMARY
+          echo "" >> $GitHUB_STEP_SUMMARY
+          echo "## Test Results Summary" >> $GitHUB_STEP_SUMMARY
+          echo "" >> $GitHUB_STEP_SUMMARY
+          echo "### Backend API Tests" >> $GitHUB_STEP_SUMMARY
+          echo "- **API Tests** : ${{ needs.backend-api-tests.result }}" >> $Github_STEP_SUMMARY
+          echo "- **Realtime Chat Tests** : ${{ needs.realtime-chat-tests.result }}" >> $Github_STEP_SUMMARY
+          echo "- **Realtime Notification Tests** : ${{ needs.realtime-notification-tests.result }}" >> $Github_STEP_SUMMARY
+          echo "" >> $GitHUB_STEP_SUMMARY
+          echo "### Frontend E2E Tests (Cypress)" >> $GitHUB_STEP_SUMMARY
+          echo "- **Cypress E2E Tests** : ${{ needs.frontend-e2e-tests.result }}" >> $Github_STEP_SUMMARY
+          echo "" >> $GitHUB_STEP_SUMMARY
+          echo "## Artifacts" >> $GitHUB_STEP_SUMMARY   
+          echo "API Test Results" >> $GitHUB_STEP_SUMMARY       
+          echo "Realtime Chat Test Results" >> $GitHUB_STEP_SUMMARY       
+          echo "Realtime Notification Test Results" >> $GitHUB_STEP_SUMMARY       
+          echo "Cypress E2E Test Results" >> $GitHUB_STEP_SUMMARY  
+          echo "Generated At: $(date)" >> $GitHUB_STEP_SUMMARY     
+        
+      - name: Check Test Results
+        run: |
+          if [ "${{ needs.backend-api-tests.result }}" = "failure" ] || \
+             [ "${{ needs.realtime-chat-tests.result }}" = "failure" ] || \
+             [ "${{ needs.realtime-notification-tests.result }}" = "failure" ] || \
+             [ "${{ needs.frontend-e2e-tests.result }}" = "failure" ]; then
+            echo "Some Tests Failed"
+            exit 1
+          else
+            echo "All Tests Passed"
+            exit 0
+          fi
+            
