@@ -3,3 +3,5 @@
 # signalR Grpc
 # Done
 # forntend v1
+# deployement k8s
+# CI/CD
