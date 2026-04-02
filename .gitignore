@@ -1,14 +1,21 @@
 /backend/api/obj
 /backend/api/bin
 
+/backend/api.Tests/obj
+/backend/api.Tests/bin
 
 /backend/realTimeChat/obj
 /backend/realTimeChat/bin
+
+/backend/realTimeChat.Tests/obj
+/backend/realTimeChat.Tests/bin
 
 
 /backend/realtimeNotification/obj
 /backend/realtimeNotification/bin
 
+/backend/realtimeNotification.Tests/obj
+/backend/realtimeNotification.Tests/bin
 
 frontend/dist
 frontend/node_modules
