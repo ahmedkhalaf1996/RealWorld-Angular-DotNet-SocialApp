@@ -35,7 +35,7 @@ jobs:
         if: always() 
         uses: actions/upload-artifact@v4
         with:
-          name: api-test-results'
+          name: api-test-results
           path: backend/api.Tests/bin/Release/**/TestResults/
   
 # realtime Chat Tests
@@ -160,24 +160,24 @@ jobs:
    
       - name: Generate Test Summary Report
         run: |
-          echo "# Autmated Testing Report " >> $GitHUB_STEP_SUMMARY
-          echo "" >> $GitHUB_STEP_SUMMARY
-          echo "## Test Results Summary" >> $GitHUB_STEP_SUMMARY
-          echo "" >> $GitHUB_STEP_SUMMARY
-          echo "### Backend API Tests" >> $GitHUB_STEP_SUMMARY
-          echo "- **API Tests** : ${{ needs.backend-api-tests.result }}" >> $Github_STEP_SUMMARY
-          echo "- **Realtime Chat Tests** : ${{ needs.realtime-chat-tests.result }}" >> $Github_STEP_SUMMARY
-          echo "- **Realtime Notification Tests** : ${{ needs.realtime-notification-tests.result }}" >> $Github_STEP_SUMMARY
-          echo "" >> $GitHUB_STEP_SUMMARY
-          echo "### Frontend E2E Tests (Cypress)" >> $GitHUB_STEP_SUMMARY
-          echo "- **Cypress E2E Tests** : ${{ needs.frontend-e2e-tests.result }}" >> $Github_STEP_SUMMARY
-          echo "" >> $GitHUB_STEP_SUMMARY
-          echo "## Artifacts" >> $GitHUB_STEP_SUMMARY   
-          echo "API Test Results" >> $GitHUB_STEP_SUMMARY       
-          echo "Realtime Chat Test Results" >> $GitHUB_STEP_SUMMARY       
-          echo "Realtime Notification Test Results" >> $GitHUB_STEP_SUMMARY       
-          echo "Cypress E2E Test Results" >> $GitHUB_STEP_SUMMARY  
-          echo "Generated At: $(date)" >> $GitHUB_STEP_SUMMARY     
+          echo "# Autmated Testing Report " >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Backend API Tests" >> $GITHUB_STEP_SUMMARY
+          echo "- **API Tests** : ${{ needs.backend-api-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Realtime Chat Tests** : ${{ needs.realtime-chat-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Realtime Notification Tests** : ${{ needs.realtime-notification-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Frontend E2E Tests (Cypress)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Cypress E2E Tests** : ${{ needs.frontend-e2e-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Artifacts" >> $GITHUB_STEP_SUMMARY   
+          echo "API Test Results" >> $GITHUB_STEP_SUMMARY       
+          echo "Realtime Chat Test Results" >> $GITHUB_STEP_SUMMARY       
+          echo "Realtime Notification Test Results" >> $GITHUB_STEP_SUMMARY       
+          echo "Cypress E2E Test Results" >> $GITHUB_STEP_SUMMARY  
+          echo "Generated At: $(date)" >> $GITHUB_STEP_SUMMARY     
         
       - name: Check Test Results
         run: |
