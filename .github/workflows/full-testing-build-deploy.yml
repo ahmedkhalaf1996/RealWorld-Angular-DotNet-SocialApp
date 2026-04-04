@@ -2,6 +2,8 @@ name: Full Application Testing - Api - Realtime, frontend
 
 on:
   push:
+    tags:
+      - 'v*.*.*'
     branches: 
       - main
       - auto-testing
