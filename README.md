@@ -5,3 +5,4 @@
 # forntend v1
 # deployement k8s
 # CI/CD
+# up
