@@ -5,6 +5,7 @@ on:
     tags: ['v*']
   workflow_run:
     workflows: ["Full Application Testing - Api - Realtime, frontend"]
+    branches: [deployment-k8s]
     types: [completed]
   workflow_dispatch:
 
