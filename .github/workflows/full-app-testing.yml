@@ -5,10 +5,12 @@ on:
     branches: 
       - main
       - auto-testing
+      - deployment-k8s
   pull_request:
     branches:
       - main
       - auto-testing
+      - deployment-k8s
 
 jobs:
   # Backend Api Tests

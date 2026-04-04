@@ -1,0 +1,20 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 As build 
+
+WORKDIR /src 
+
+COPY ["api/api.csproj", "api/"]
+# COPY ["realTimeChat/realTimeChat.csproj", "realTimeChat/"]
+# COPY ["realtimeNotification/realtimeNotification.csproj", "realtimeNotification/"]
+
+RUN dotnet restore "api/api.csproj" 
+
+COPY . . 
+WORKDIR "/src/api"
+RUN dotnet publish "api.csproj" -c Release -o /app/publish /p:UseAppHost=false 
+
+# final stage   
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final  
+WORKDIR /app
+COPY --from=build /app/publish .
+
+ENTRYPOINT [ "dotnet", "api.dll" ]
