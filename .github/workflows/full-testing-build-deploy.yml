@@ -4,19 +4,13 @@ on:
   push:
     tags:
       - 'v*.*.*'
-    branches: 
-      - main
-      - auto-testing
-      - deployment-k8s
   pull_request:
     branches:
       - main
       - auto-testing
       - deployment-k8s
 
-concurrency:
-  group: ci-${{ github.sha }}
-  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+
 
 jobs:
   # Backend Api Tests
