@@ -2,6 +2,10 @@ name: Full Application Testing - Api - Realtime, frontend
 
 on:
   push:
+    branches:
+      - main
+      - auto-testing
+      - deployment-k8s
     tags:
       - 'v*.*.*'
   pull_request:
