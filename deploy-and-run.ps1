@@ -16,7 +16,14 @@ if ([string]::IsNullOrWhiteSpace($commitMessage)) {
     $commitMessage = "Release  $version"
 }
 
-# 3 Todo: Update kubernetes MainFests
+# 3  Update kubernetes MainFests
+write-Host "n[1/4] Updating Kubernetes manifests with version '$version'..." -ForegroundColor Yellow
+$files = Get-ChildItem -Path "k8s/*.yaml" 
+foreach ($file in $files) {
+   $content = Get-Content $file.FullName
+    $newContent = $content -replace 'image: (ahmedkhalaf666/social-dotnet-.*):.*?):.*', "image: `$1:$version"
+    $newContent | Set-Content $file.FullName
+}
 
 # 4 Push To gitHub
 Write-Host "n[2/4] Pushing changes and tags to GitHub..." -ForegroundColor Yellow
@@ -38,3 +45,22 @@ if ($confirmation -ne 'y') {
 
 write-Host "GitHub Actions completed. Proceeding to deploy to Kubernetes..." -ForegroundColor Green
 # 6 Todo Deploy To Kubernetes 
+write-Host "n[3/4] applying to manifests..." -ForegroundColor Yellow
+kubectl apply -f k8s/mongo.yaml
+kubectl apply -f k8s/api.yaml
+kubectl apply -f k8s/chat.yaml
+kubectl apply -f k8s/notification.yaml
+kubectl apply -f k8s/frontend.yaml
+kubectl apply -f k8s/ingress.yaml
+kubectl apply -f k8s/ingress-chat.yaml
+kubectl apply -f k8s/ingress-notification.yaml
+
+# 7 Forec Update 
+write-Host "n[4/4] Forcing  rollout..." -ForegroundColor Yellow
+kubectl rollout restart deployment/api 
+kubectl rollout restart deployment/chat
+kubectl rollout restart deployment/notification
+kubectl rollout restart deployment/frontend
+
+write-Host "Deployment completed successfully!" -ForegroundColor Green
+write-Host "You can access the application at http://localhost" -ForegroundColor Cyan

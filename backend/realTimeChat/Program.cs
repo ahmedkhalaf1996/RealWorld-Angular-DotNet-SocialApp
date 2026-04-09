@@ -19,7 +19,7 @@ app.UseCors(builder => builder
 
 // app.UseHttpsRedirection();
 
-app.MapHub<ChatHub>("/hubs/chat");
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();
 

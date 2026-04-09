@@ -30,6 +30,6 @@ app.MapGrpcReflectionService();
 // app.UseAuthorization();
 // app.MapControllers();
 
-app.MapHub<NotificationHub>("/hubs/Notifications");
+app.MapHub<NotificationHub>("/notificationHub");
 
 app.Run();
