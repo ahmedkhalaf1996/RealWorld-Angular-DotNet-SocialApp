@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ahmedkhalaf666/social-dotnet-frontend:v2.2.7
+        image: ahmedkhalaf666/social-dotnet-frontend:v2.5.8
         ports:
         - containerPort: 80
 ---
