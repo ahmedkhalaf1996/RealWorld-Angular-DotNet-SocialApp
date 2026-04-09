@@ -20,8 +20,8 @@ if ([string]::IsNullOrWhiteSpace($commitMessage)) {
 write-Host "n[1/4] Updating Kubernetes manifests with version '$version'..." -ForegroundColor Yellow
 $files = Get-ChildItem -Path "k8s/*.yaml" 
 foreach ($file in $files) {
-   $content = Get-Content $file.FullName
-    $newContent = $content -replace 'image: (ahmedkhalaf666/social-dotnet-.*?):.*):.*', "image: `$1:$version"
+    $content = Get-Content $file.FullName
+    $newContent = $content -replace 'image: (ahmedkhalaf666/social-dotnet-.*?):.*', "image: `$1:$version"    
     $newContent | Set-Content $file.FullName
 }
 
