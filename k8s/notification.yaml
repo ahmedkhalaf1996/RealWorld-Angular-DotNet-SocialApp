@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: notification
-        image: ahmedkhalaf666/social-dotnet-notification:v4.0.0
+        image: ahmedkhalaf666/social-dotnet-notification:v4.4.4
         ports:
         - containerPort: 80
         env:

@@ -8,7 +8,9 @@ public class RealTimeChatClient
 
     public RealTimeChatClient()
     {
-        var channel = GrpcChannel.ForAddress("http://localhost:5001");
+        var apiUrl = Environment.GetEnvironmentVariable("GrpcServices__ApiService") ?? "http://api-service:81";
+            var channel = GrpcChannel.ForAddress(apiUrl);
+        // var channel = GrpcChannel.ForAddress("http://localhost:5001");
         _client = new RealTimeChatService.RealTimeChatServiceClient(channel);
     }
 
