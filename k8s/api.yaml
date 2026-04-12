@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: api
-        image: ahmedkhalaf666/social-dotnet-api:v2.5.8
+        image: ahmedkhalaf666/social-dotnet-api:v3.0.0
         ports:
         - containerPort: 80
         - containerPort: 81
