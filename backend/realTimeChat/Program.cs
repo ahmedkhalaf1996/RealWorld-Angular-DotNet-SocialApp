@@ -14,6 +14,10 @@ builder.Services.AddSingleton<ChatService>();
 var redisConnection = builder.Configuration["Redis:ConnectionString"] ?? "localhost:6379";
 
 builder.Services.AddSignalR().AddStackExchangeRedis(redisConnection);
+builder.Services.AddSingleton<StackExchange.Redis.IConnectionMultiplexer>(
+    StackExchange.Redis.ConnectionMultiplexer.Connect(redisConnection)
+);
+
 
 builder.Services.AddCors();
 builder.Services.AddGrpc();

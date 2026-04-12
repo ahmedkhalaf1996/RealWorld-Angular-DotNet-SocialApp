@@ -1,162 +1,197 @@
+using realTimeServices.Dtos;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
-using StackExchange.Redis;
-using realTimeServices.Dtos;
+
 
 namespace realTimeServices.Services
 {
     public class ChatService
     {
-        private readonly IDatabase _db;
-        private readonly RealTimeChatClient _client;
+        private static readonly Dictionary<string, string> Users = new Dictionary<string, string>();
 
-        // Automatically injected by Program.cs
-        public ChatService(IConnectionMultiplexer redis, RealTimeChatClient client)
+        public class Rooms
         {
-            _db = redis.GetDatabase();
-            _client = client;
+            public Dictionary<string , List<String>> Room {get; set;} = new Dictionary<string, List<string>>();
         }
+
+        Rooms room = new Rooms();
 
         public void SaveMessageToDb(MessageDto message)
         {
-            _client.SendMessage(message.content, message.sender, message.recever);
+            var client = new RealTimeChatClient();
+            client.SendMessage(message.content, message.sender, message.recever);
         }
 
         public List<string> AddAndGetUserRooms(string userid)
         {
+            var client = new RealTimeChatClient();
             List<string> uides = new List<string>();
 
-            if (userid != "undefined" && !string.IsNullOrEmpty(userid))
+            if (userid != "undefined" && userid != "" && userid is not null)
             {
-                var uidesx = _client.GetUsersIdes(userid);
-
-                foreach (var id in uidesx)
+                var uidesx = client.GetUsersIdes(userid);
+                uidesx.ForEach((id) =>
                 {
-                    // If the friend is active in Redis
-                    if (_db.HashExists("UserRooms", id))
+                  if (room.Room.ContainsKey(id))
                     {
+                        //uides.Add(id);
                         if (!uides.Contains(id)) uides.Add(id);
-                    }
+                    }  
+                });
+
+                if (room.Room.ContainsKey(userid))
+                {
+                    room.Room[userid] = uides;
+                } else
+                {
+                    room.Room.Add(userid, uides);
                 }
 
-                // Update this user's friends list in Redis
-                _db.HashSet("UserRooms", userid, JsonSerializer.Serialize(uides));
-
-                // Add this user to all their friends' rooms in Redis
-                foreach (var uid in uides)
+                // add userid to other users rooms
+                foreach(var uid in uides)
                 {
-                    var otherRoomJson = _db.HashGet("UserRooms", uid);
-                    List<string> otherRoom = otherRoomJson.HasValue
-                        ? JsonSerializer.Deserialize<List<string>>(otherRoomJson.ToString()) ?? new List<string>()
-                        : new List<string>();
-
-                    if (!otherRoom.Contains(userid))
+                    if (room.Room.ContainsKey(uid))
                     {
-                        otherRoom.Add(userid);
-                        _db.HashSet("UserRooms", uid, JsonSerializer.Serialize(otherRoom));
+                        // room.Room[uid].Add(userid);
+                        if (!room.Room[uid].Contains(userid)) room.Room[uid].Add(userid);
                     }
                 }
 
                 uides.Add(userid);
             }
-
             return uides;
         }
 
-        public List<string> RemoveUserFromList(string userid)
+        public List<string>? RemoveUserFromList(string userid)
         {
-            if (userid != "undefined" && !string.IsNullOrEmpty(userid))
+            if (userid != "undefined" && userid != "" && userid is not null)
             {
-                _db.HashDelete("OnlineUsers", userid);
-
-                var roomsJson = _db.HashGet("UserRooms", userid);
-                if (!roomsJson.HasValue) return null;
-
-                var uides = JsonSerializer.Deserialize<List<string>>(roomsJson.ToString()) ?? new List<string>();
-                var removedlist = uides.ToList();
-
-                foreach (var uid in uides)
+                lock (Users)
                 {
-                    var otherRoomJson = _db.HashGet("UserRooms", uid);
-                    if (otherRoomJson.HasValue)
+                    if (Users.ContainsKey(userid))
                     {
-                        var otherRoom = JsonSerializer.Deserialize<List<string>>(otherRoomJson.ToString()) ?? new List<string>();
-                        if (otherRoom.Remove(userid))
-                        {
-                            _db.HashSet("UserRooms", uid, JsonSerializer.Serialize(otherRoom));
-                        }
+                        Users.Remove(userid);
                     }
                 }
 
-                _db.HashDelete("UserRooms", userid);
+                var uides = room.Room[userid];
+                var removedlist = room.Room[userid];
+
+                foreach (var uid in uides.ToArray())
+                {
+                    if (room.Room.ContainsKey(uid))
+                    {
+                        room.Room[uid].Remove(userid);
+                    }
+                }
+
+                if (room.Room.ContainsKey(userid))
+                {
+                    room.Room.Remove(userid);
+                }
+
                 removedlist.Add(userid);
                 return removedlist;
+            } else
+            {
+                return null;
             }
-            return null;
+
         }
 
-        public string[] GetOnlineUsers(string id)
+        public string[]? GetOnlineUsers(string id)
         {
             try
             {
-                var online = GetOnlyUserRooms(id);
-                return online?.ToArray();
+                var online = room.Room[id].ToArray();
+                return online;
             }
-            catch
+            catch 
             {
-                return null;
+                
+               return null;
             }
         }
 
-        public List<string> GetOnlyUserRooms(string userid)
+        public List<string>? GetOnlyUserRooms(string userid)
         {
             try
             {
-                var roomsJson = _db.HashGet("UserRooms", userid);
-                if (roomsJson.HasValue)
-                {
-                    return JsonSerializer.Deserialize<List<string>>(roomsJson.ToString()) ?? new List<string>();
-                }
-                return null;
+                List<string> uidesList = room.Room[userid];
+                return uidesList;
             }
-            catch
+            catch 
             {
-                return null;
+                
+              return null;
             }
         }
 
-        // connection method
         public void AddUserConnectionId(string userid, string connectionId)
         {
-            if (userid != "undefined" && !string.IsNullOrEmpty(userid) &&
-                connectionId != "undefined" && !string.IsNullOrEmpty(connectionId))
+            if (
+                userid != "undefined" &&
+                userid != "" && 
+                userid is not null &&
+                connectionId != "undefined" &&
+                connectionId != "" && 
+                connectionId is not null 
+                )
             {
-                _db.HashSet("OnlineUsers", userid, connectionId);
+                lock(Users)
+                {
+                    if (!Users.ContainsKey(userid))
+                    {
+                        Users[userid] = connectionId;
+                    }
+                }
             }
         }
 
-        // get user by connection id
-        public string GetUserIdByConnectionId(string connectionId)
+        // get user by connction id 
+        public string GetUserIdByConnectionID(string connectionId)
         {
-            if (connectionId != "undefined" && !string.IsNullOrEmpty(connectionId))
+            if (  connectionId != "undefined" &&  connectionId != "" &&  connectionId is not null )
             {
-                var onlineUsers = _db.HashGetAll("OnlineUsers");
-                var user = onlineUsers.FirstOrDefault(x => x.Value == connectionId);
-                return user.Key.HasValue ? user.Key.ToString() : "";
+                lock(Users)
+                {
+                    var list = Users.Where(x => x.Value == connectionId).Select(x => x.Key).FirstOrDefault();
+                    if (list is not null)
+                    {
+                        return list;
+                    } else
+                    {
+                        return "";
+                    }
+                }
+            } else
+            {
+                return "";
             }
-            return "";
         }
 
-        // get connection id by user
-        public string GetConnectionIdByUser(string user)
+        public string GetConnectionIdByUser(string user) // user represent userid
         {
-            if (user != "undefined" && !string.IsNullOrEmpty(user))
+            if(user != "undefined" && user != "")
             {
-                var connId = _db.HashGet("OnlineUsers", user);
-                return connId.HasValue ? connId.ToString() : "";
+                lock (Users)
+                {
+                    var list = Users.Where(x => x.Key == user).Select(x => x.Value).FirstOrDefault();
+                    if (list is not null)
+                    {
+                        return list;
+                    } else
+                    {
+                        return "";
+                    }
+                }
+            } else
+            {
+                return "";
             }
-            return "";
         }
+
+
+
     }
 }
