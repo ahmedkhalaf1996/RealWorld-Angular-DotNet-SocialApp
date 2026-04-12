@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: chat
-        image: ahmedkhalaf666/social-dotnet-chat:v3.0.1
+        image: ahmedkhalaf666/social-dotnet-chat:v3.2.0
         ports:
         - containerPort: 80
         env:
