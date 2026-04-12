@@ -47,6 +47,7 @@ write-Host "GitHub Actions completed. Proceeding to deploy to Kubernetes..." -Fo
 # 6 Todo Deploy To Kubernetes 
 write-Host "n[3/4] applying to manifests..." -ForegroundColor Yellow
 kubectl apply -f k8s/mongo.yaml
+kubectl apply -f k8s/redis.yaml
 kubectl apply -f k8s/api.yaml
 kubectl apply -f k8s/chat.yaml
 kubectl apply -f k8s/notification.yaml

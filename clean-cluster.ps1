@@ -17,6 +17,7 @@ kubectl delete -f k8s/chat.yaml --ignore-not-found
 kubectl delete -f k8s/notification.yaml --ignore-not-found
 kubectl delete -f k8s/frontend.yaml --ignore-not-found
 kubectl delete -f k8s/mongo.yaml --ignore-not-found
+kubectl delete -f k8s/redis.yaml --ignore-not-found
 
 write-host "Cluster cleaned successfully." -foregroundcolor Green
 

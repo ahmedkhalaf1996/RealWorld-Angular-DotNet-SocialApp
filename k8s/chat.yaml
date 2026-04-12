@@ -14,12 +14,14 @@ spec:
     spec:
       containers:
       - name: chat
-        image: ahmedkhalaf666/social-dotnet-chat:v3.0.0
+        image: ahmedkhalaf666/social-dotnet-chat:v3.0.1
         ports:
         - containerPort: 80
         env:
         - name: ASPNETCORE_HTTP_PORTS
           value: "80"
+        - name: Redis__ConnectionString
+          value: "redis:6379"
         - name: GrpcServices__ApiService
           value: "http://api-service:81"
         - name: JwtSecret__Secret
