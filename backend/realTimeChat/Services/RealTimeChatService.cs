@@ -1,129 +1,70 @@
 using realTimeServices.Protos;
 using Grpc.Net.Client;
 
-namespace realTimeServices.Services
+namespace realTimeChat.Services
 {
-    public class RealTimeChatClient
+    
+public class RealTimeChatClient
+{
+    private readonly RealTimeChatService.RealTimeChatServiceClient _client;
+
+    public RealTimeChatClient(IConfiguration config)
     {
-        private readonly RealTimeChatService.RealTimeChatServiceClient _client;
+        var apiUrl = config["GrpcServices:ApiService"] ?? "http://api-service:81";
+            var channel = GrpcChannel.ForAddress(apiUrl);
+        // var channel = GrpcChannel.ForAddress("http://localhost:5001");
+        _client = new RealTimeChatService.RealTimeChatServiceClient(channel);
+    }
 
-        // Dependency Injection pulls the IConfiguration to securely read K8s variables
-        public RealTimeChatClient(IConfiguration config)
+
+    public void SendMessage(string content, string sender, string recever)
+    {
+        var request = new MessageRequest
         {
-            var apiServiceUrl = config["GrpcServices:ApiService"] ?? "http://localhost:5001";
-            var channel = GrpcChannel.ForAddress(apiServiceUrl);
-            _client = new RealTimeChatService.RealTimeChatServiceClient(channel);
+            Content = content,
+            Sender = sender,
+            Recever = recever
+        };
+
+        try
+        {
+            var response = _client.SendMessage(request);
+            Console.WriteLine($"Received message: {response.Message}");
         }
-
-        public void SendMessage(string content, string sender, string recever)
+        catch (Exception ex)
         {
-            var request = new MessageRequest
-            {
-                Content = content,
-                Sender = sender,
-                Recever = recever
-            };
+         Console.WriteLine($"Warining : could not send message to amin api via grpc : {ex.Message}");
+            
+        }
+    }
 
+
+    // get user frinds using grpc form api
+    public List<string> GetUsersIdes(string id)
+    {
+        var request = new UserID
+        {
+            Userid = id
+        };
+        if (request.Userid != "undefind" && request.Userid != "")
+        {
             try
             {
-                var response = _client.SendMessage(request);
-                Console.WriteLine($"Received message: {response.Message}");
+                var response = _client.GetUserFollowingFollowers(request);
+                var userIDsList = response.UserIDsLists.FirstOrDefault();
+                if (userIDsList != null )
+                {
+                    return userIDsList.UserIdsList.ToList();
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warining : could not send message to amin api via grpc : {ex.Message}");
+                 Console.WriteLine($"Warining : could not conntxt to amin api for user reslatjionships : {ex.Message}");
             }
         }
-
-        public List<string> GetUsersIdes(string id)
-        {
-            var request = new UserID { Userid = id };
-
-            if (request.Userid != "undefind" && request.Userid != "")
-            {
-                try
-                {
-                    var response = _client.GetUserFollowingFollowers(request);
-                    var userIDsList = response.UserIDsLists.FirstOrDefault();
-                    if (userIDsList != null)
-                    {
-                        return userIDsList.UserIdsList.ToList();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Warining : could not conntxt to amin api for user reslatjionships : {ex.Message}");
-                }
-            }
-            return new List<string>();
-        }
+        return new List<string>();
     }
+
+
 }
-
-// using realTimeServices.Protos;
-// using Grpc.Net.Client;
-
-
-// public class RealTimeChatClient
-// {
-//     private readonly RealTimeChatService.RealTimeChatServiceClient _client;
-
-//     public RealTimeChatClient()
-//     {
-//         var apiUrl = Environment.GetEnvironmentVariable("GrpcServices__ApiService") ?? "http://api-service:81";
-//             var channel = GrpcChannel.ForAddress(apiUrl);
-//         // var channel = GrpcChannel.ForAddress("http://localhost:5001");
-//         _client = new RealTimeChatService.RealTimeChatServiceClient(channel);
-//     }
-
-
-//     public void SendMessage(string content, string sender, string recever)
-//     {
-//         var request = new MessageRequest
-//         {
-//             Content = content,
-//             Sender = sender,
-//             Recever = recever
-//         };
-
-//         try
-//         {
-//             var response = _client.SendMessage(request);
-//             Console.WriteLine($"Received message: {response.Message}");
-//         }
-//         catch (Exception ex)
-//         {
-//          Console.WriteLine($"Warining : could not send message to amin api via grpc : {ex.Message}");
-            
-//         }
-//     }
-
-
-//     // get user frinds using grpc form api
-//     public List<string> GetUsersIdes(string id)
-//     {
-//         var request = new UserID
-//         {
-//             Userid = id
-//         };
-//         if (request.Userid != "undefind" && request.Userid != "")
-//         {
-//             try
-//             {
-//                 var response = _client.GetUserFollowingFollowers(request);
-//                 var userIDsList = response.UserIDsLists.FirstOrDefault();
-//                 if (userIDsList != null )
-//                 {
-//                     return userIDsList.UserIdsList.ToList();
-//                 }
-//             }
-//             catch (Exception ex)
-//             {
-//                  Console.WriteLine($"Warining : could not conntxt to amin api for user reslatjionships : {ex.Message}");
-//             }
-//         }
-//         return new List<string>();
-//     }
-
-
-// }
+}
