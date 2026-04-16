@@ -1,5 +1,6 @@
 using realTimeServices.Services;
 using realTimeServices.Hubs;
+using realTimeChat.Services;
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel(options =>
 {

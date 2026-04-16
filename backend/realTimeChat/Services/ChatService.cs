@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using StackExchange.Redis;
 using System.Text.Json;
+using realTimeChat.Services;
 
 namespace realTimeServices.Services
 {
@@ -23,7 +24,6 @@ namespace realTimeServices.Services
 
         public List<string> AddAndGetUserRooms(string userid)
         {
-            var client = new RealTimeChatClient();
             List<string> uides = new List<string>();
 
             if (userid != "undefined" && userid != "" && userid is not null)
