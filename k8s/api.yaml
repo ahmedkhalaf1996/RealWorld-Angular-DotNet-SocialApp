@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+      - name: api
+        image: ahmedkhalaf666/social-dotnet-api:v7.0.0
+        ports:
+        - containerPort: 80
+        - containerPort: 81
+        env:
+        - name: ASPNETCORE_HTTP_PORTS
+          value: "80"
+        - name: ASPNETCORE_GRPC_PORTS
+          value: "81"
+        - name: MongoDB__ConnectionString
+          value: "mongodb://mongo:27017"
+        - name: MongoDB__DatabaseName
+          value: "SocialApp"
+        - name: MongoDB__UserCollection
+          value: "Users"
+        - name: MongoDB__PostCollection
+          value: "Posts"
+        - name: MongoDB__MessageCollection
+          value: "Messages"
+        - name: MongoDB__UnMessageCollection
+          value: "UnreadMessages"
+        - name: MongoDB__NotificationCollection
+          value: "Notifications"
+        - name: MongoDB__CommentCollection
+          value: "Comments"
+        - name: GrpcServices__ChatService
+          value: "http://chat-service:81"
+        - name: GrpcServices__NotificationService
+          value: "http://notification-service:81"
+        - name: JwtSecret__Secret
+          value: "ThisIsASecretKeyForJwtTokenGenerationOnBackendSideForSecurityPurpose"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+spec:
+  selector:
+    app: api
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  - name: grpc
+    port: 81
+    targetPort: 81

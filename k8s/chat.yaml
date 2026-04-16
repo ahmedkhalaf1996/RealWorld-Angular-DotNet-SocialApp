@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: chat
+  template:
+    metadata:
+      labels:
+        app: chat
+    spec:
+      containers:
+      - name: chat
+        image: ahmedkhalaf666/social-dotnet-chat:v7.0.0
+        ports:
+        - containerPort: 80
+        env:
+        - name: ASPNETCORE_HTTP_PORTS
+          value: "80"
+        - name: Redis__ConnectionString
+          value: "redis:6379"
+        - name: GrpcServices__ApiService
+          value: "http://api-service:81"
+        - name: JwtSecret__Secret
+          value: "ThisIsASecretKeyForJwtTokenGenerationOnBackendSideForSecurityPurpose"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-service
+spec:
+  selector:
+    app: chat
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  - port: 81
+    targetPort: 81
+    name: grpc

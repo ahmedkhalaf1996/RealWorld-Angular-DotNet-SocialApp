@@ -7,6 +7,14 @@ using Microsoft.OpenApi.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
+// Configure kestrel limits and ports
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(80, o => o.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1);
+    options.ListenAnyIP(81, o => o.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2);
+    
+});;
+
 
 builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDB"));
 builder.Services.AddSingleton<IUserService, UserService>();
@@ -96,7 +104,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 // Map Grpc Service 
 app.MapGrpcService<RealtimeChatGrpcService>();

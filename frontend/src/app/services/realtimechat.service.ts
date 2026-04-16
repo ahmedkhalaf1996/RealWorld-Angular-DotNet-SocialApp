@@ -61,7 +61,7 @@ async StartUserConnection(){
 // createChatConnection
 async createChatConnection(){
   this.chatConnection = new HubConnectionBuilder()
-  .withUrl(`${environment.RaeltimeUrl}hubs/chat?UserID=${this.userid}`).withAutomaticReconnect().build();
+  .withUrl(`${environment.RaeltimeUrl}?UserID=${this.userid}`).withAutomaticReconnect().build();
 
   await  this.chatConnection.start().catch(error => {
     console.log("error starting chat connection:", error);

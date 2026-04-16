@@ -1,0 +1,18 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 As build 
+
+WORKDIR /src 
+
+COPY ["realTimeChat/realTimeChat.csproj", "realTimeChat/"]
+
+RUN dotnet restore "realTimeChat/realTimeChat.csproj" 
+
+COPY . . 
+WORKDIR "/src/realTimeChat"
+RUN dotnet publish "realTimeChat.csproj" -c Release -o /app/publish /p:UseAppHost=false 
+
+# final stage   
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final  
+WORKDIR /app
+COPY --from=build /app/publish .
+
+ENTRYPOINT [ "dotnet", "realTimeChat.dll" ]

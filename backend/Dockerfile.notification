@@ -1,0 +1,18 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 As build 
+
+WORKDIR /src 
+
+COPY ["realtimeNotification/realtimeNotification.csproj", "realtimeNotification/"]
+
+RUN dotnet restore "realtimeNotification/realtimeNotification.csproj" 
+
+COPY . . 
+WORKDIR "/src/realtimeNotification"
+RUN dotnet publish "realtimeNotification.csproj" -c Release -o /app/publish /p:UseAppHost=false 
+
+# final stage   
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final  
+WORKDIR /app
+COPY --from=build /app/publish .
+
+ENTRYPOINT [ "dotnet", "realtimeNotification.dll" ]

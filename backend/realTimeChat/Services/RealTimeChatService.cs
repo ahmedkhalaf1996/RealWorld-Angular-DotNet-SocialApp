@@ -1,14 +1,18 @@
 using realTimeServices.Protos;
 using Grpc.Net.Client;
 
-
+namespace realTimeChat.Services
+{
+    
 public class RealTimeChatClient
 {
     private readonly RealTimeChatService.RealTimeChatServiceClient _client;
 
-    public RealTimeChatClient()
+    public RealTimeChatClient(IConfiguration config)
     {
-        var channel = GrpcChannel.ForAddress("http://localhost:5001");
+        var apiUrl = config["GrpcServices:ApiService"] ?? "http://api-service:81";
+            var channel = GrpcChannel.ForAddress(apiUrl);
+        // var channel = GrpcChannel.ForAddress("http://localhost:5001");
         _client = new RealTimeChatService.RealTimeChatServiceClient(channel);
     }
 
@@ -62,4 +66,5 @@ public class RealTimeChatClient
     }
 
 
+}
 }

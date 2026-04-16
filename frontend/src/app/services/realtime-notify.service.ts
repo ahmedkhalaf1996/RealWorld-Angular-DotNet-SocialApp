@@ -26,7 +26,7 @@ export class RealtimeNotifyService {
     private usersService: UsersService,
   ){
     this.hubCommention = new HubConnectionBuilder()
-    .withUrl(`${environment.RealtimeNotification}hubs/Notifications`)
+    .withUrl(`${environment.RealtimeNotification}`)
     .withAutomaticReconnect()
     .build();
   }

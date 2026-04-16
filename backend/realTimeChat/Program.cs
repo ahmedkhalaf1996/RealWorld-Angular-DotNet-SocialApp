@@ -1,11 +1,29 @@
 using realTimeServices.Services;
 using realTimeServices.Hubs;
+using realTimeChat.Services;
 var builder = WebApplication.CreateBuilder(args);
-
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(80, o => o.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1);
+    options.ListenAnyIP(81, o => o.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2);
+    
+});;
 
 builder.Services.AddSingleton<ChatService>();
 
-builder.Services.AddSignalR();
+// redis 
+var redisConnection = builder.Configuration["Redis:ConnectionString"] ?? "localhost:6379";
+
+builder.Services.AddSignalR().AddStackExchangeRedis(redisConnection);
+
+builder.Services.AddSingleton<StackExchange.Redis.IConnectionMultiplexer>(
+    StackExchange.Redis.ConnectionMultiplexer.Connect(redisConnection)
+);
+
+// Register custom services for dependency injection
+builder.Services.AddSingleton<RealTimeChatClient>();
+builder.Services.AddSingleton<ChatService>();
+
 builder.Services.AddCors();
 builder.Services.AddGrpc();
 
@@ -19,7 +37,7 @@ app.UseCors(builder => builder
 
 // app.UseHttpsRedirection();
 
-app.MapHub<ChatHub>("/hubs/chat");
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();
 
